@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Application.Services;
+using Application.Validators;
+using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -12,6 +15,8 @@ namespace Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
+            services.AddScoped<IProductService, ProductService>();
+            services.AddValidatorsFromAssemblyContaining<ProductDtoValidator>();
             return services;
         }
     }

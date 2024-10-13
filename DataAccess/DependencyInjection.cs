@@ -20,6 +20,8 @@ namespace DataAccess
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString, IConfigurationSection jwtSettings)
         {
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             services.AddIdentity<AppUser, IdentityRole<int>>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();

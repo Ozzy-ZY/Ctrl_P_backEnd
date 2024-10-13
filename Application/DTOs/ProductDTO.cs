@@ -7,5 +7,11 @@ using System.Threading.Tasks;
 
 namespace Application.DTOs
 {
-    public record ProductDTO(string Name, string Description, int UnitsInStock, string Category, string ImageUrl);
+    public record ProductDTO(
+        int Id,
+        string Name,
+        string Description,
+        int UnitsInStock,
+        string Category,
+        string ImageUrl);
 }

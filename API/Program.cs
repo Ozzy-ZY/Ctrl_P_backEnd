@@ -1,7 +1,9 @@
 using Application;
+using Application.Validators;
 using DataAccess;
 using Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("DefaultConnection")!,
     builder.Configuration.GetSection("Jwt"));
+
+builder.Services.AddApplication();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
