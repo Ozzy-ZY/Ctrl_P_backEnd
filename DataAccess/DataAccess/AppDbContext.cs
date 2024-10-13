@@ -1,4 +1,6 @@
 ﻿using Domain.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,9 +10,12 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.DataAccess
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
     {
         public DbSet<Product> Products { get; set; }
+        public DbSet<Service> Services { get; set; }
+        public DbSet<Address> Addresss { get; set; }
+        public DbSet<AppUser> User { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
