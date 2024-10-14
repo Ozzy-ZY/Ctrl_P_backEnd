@@ -14,6 +14,8 @@ namespace Domain.ModelsConfig
         public void Configure(EntityTypeBuilder<AppUser> builder)
         {
             builder.HasOne(x => x.Address).WithOne();
+            builder.Property(x => x.UserName).HasMaxLength(64).IsRequired();
+            builder.HasIndex(x => x.UserName).IsUnique();
         }
     }
 }
