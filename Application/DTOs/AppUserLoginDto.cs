@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.DTOs
 {
-    public record AppUserLoginModel(string UserName)
+    public record AppUserLoginDto(string UserName, string Password)
     {
     }
 }
