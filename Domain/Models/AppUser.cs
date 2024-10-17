@@ -10,7 +10,5 @@ namespace Domain.Models
     public class AppUser : IdentityUser<int>
     {
         public override string UserName { get; set; }
-        public int AddressId { get; set; }
-        public virtual Address Address { get; set; }
     }
 }
