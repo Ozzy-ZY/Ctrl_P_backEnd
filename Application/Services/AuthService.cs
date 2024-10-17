@@ -18,10 +18,10 @@ namespace Application.Services
     public class AuthService : IAuthService
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<IdentityRole<int>> _roleManager;
         private readonly IConfiguration _configuration;
 
-        public AuthService(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        public AuthService(UserManager<AppUser> userManager, RoleManager<IdentityRole<int>> roleManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -38,12 +38,14 @@ namespace Application.Services
             {
                 return new Result { Success = false, Message = "User Already Exists" };
             }
+
             var user = model.AsAppUser();
             if (!(await _userManager.CreateAsync(user, model.Password)).Succeeded)
             {
                 return new Result { Success = false, Message = "Error Creating User" };
             }
-            var roleCreationResult = await _roleManager.CreateAsync(new IdentityRole(role));
+
+            var roleCreationResult = await _roleManager.CreateAsync(new IdentityRole<int>(role));
             if (!roleCreationResult.Succeeded)
             {
                 if (!roleCreationResult.Errors.Any(e => e.Code == "RoleAlreadyExists"))
@@ -51,6 +53,7 @@ namespace Application.Services
                     return new Result { Success = false, Message = "Error Creating Role" };
                 }
             }
+
             await _userManager.AddToRoleAsync(user, role);
 
             return new Result { Success = true, Message = "Successful Registration" };
@@ -68,16 +71,19 @@ namespace Application.Services
                     Message = "Please Enter Valid Credentials"
                 };
             }
+
             var userRoles = await _userManager.GetRolesAsync(user);
             var authClaims = new List<Claim>
             {
                new Claim(ClaimTypes.Name, user.UserName),
                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
+
             foreach (var userRole in userRoles)
             {
                 authClaims.Add(new Claim(ClaimTypes.Role, userRole));
             }
+
             string token = GenerateToken(authClaims);
             return new Result()
             {
@@ -88,7 +94,7 @@ namespace Application.Services
 
         private string GenerateToken(IEnumerable<Claim> claims)
         {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]!));
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

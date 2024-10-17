@@ -4,6 +4,9 @@ using DataAccess;
 using Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
+using Scalar.AspNetCore;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +15,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "Auth",
+        Type = SecuritySchemeType.ApiKey
+    });
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
 builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("DefaultConnection")!,
     builder.Configuration.GetSection("Jwt"));
 
@@ -25,6 +37,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    //app.UseSwagger(options =>
+    //{
+    //    options.RouteTemplate = "openapi/{documentName}.json";
+    //});
+    ////app.MapScalarApiReference(options =>
+    //{
+    //    options.WithTitle("Ctrl+P")
+    //    .WithTheme(ScalarTheme.Mars);
+    //});
 }
 app.UseHttpsRedirection();
 

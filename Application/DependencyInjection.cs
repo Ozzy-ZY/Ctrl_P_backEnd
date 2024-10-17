@@ -17,6 +17,8 @@ namespace Application
         {
             services.AddScoped<IProductService, ProductService>();
             services.AddValidatorsFromAssemblyContaining<ProductDtoValidator>();
+            services.AddTransient<IAuthService, AuthService>();
+
             return services;
         }
     }
