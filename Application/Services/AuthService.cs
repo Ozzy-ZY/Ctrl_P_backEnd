@@ -95,12 +95,19 @@ namespace Application.Services
         private string GenerateToken(IEnumerable<Claim> claims)
         {
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!));
-
+            var roleClaim = claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            // configure based on Role
+            var expiryMinutes = roleClaim switch
+            {
+                "Admin" => int.Parse(_configuration["Jwt:AdminExpiryMinutes"]!),
+                "User" => int.Parse(_configuration["Jwt:UserExpiryMinutes"]!),
+                _ => int.Parse(_configuration["Jwt:UserExpiryMinutes"]!)
+            };
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Issuer = _configuration["Jwt:ValidIssuer"],
                 Audience = _configuration["Jwt:ValidAudience"],
-                Expires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["Jwt:ExpiryMinutes"]!)),// should Always be there temporarly
+                Expires = DateTime.UtcNow.AddMinutes(expiryMinutes),// should Always be there temporarly
                 SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256),
                 Subject = new ClaimsIdentity(claims)
             };
