@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Helpers
+namespace Application.DTOs.AuthModels
 {
     public class RegisterResult
     {

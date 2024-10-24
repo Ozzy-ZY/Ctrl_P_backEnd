@@ -1,5 +1,4 @@
 ﻿using Application.DTOs.AuthModels;
-using Application.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +12,6 @@ namespace Application.Services
         public Task<RegisterResult> RegistrationAsync(AppUserRegisterationDto model, string role);
 
         public Task<LoginResult> LoginAsync(AppUserLoginDto model);
+        public Task<LoginResult> RefreshTokenAsync(RequestTokenModel model);
     }
 }

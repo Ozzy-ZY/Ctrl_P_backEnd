@@ -1,5 +1,4 @@
 ﻿using Application.DTOs.Mappers;
-using Application.Helpers;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +14,9 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 using Application.DTOs.AuthModels;
 using Infrastructure.DataAccess;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Application.Services
 {
@@ -113,13 +115,68 @@ namespace Application.Services
             }
             else
             {
-                var refreshToken = GenerateRefreshToken();
-                loginResult.RefreshToken = refreshToken!.Token;
-                loginResult.RefreshTokenExpiration = refreshToken.ExpiresOn;
-                user.RefreshTokens!.Add(refreshToken);
-                await _userManager.UpdateAsync(user);
+                using var transaction = await _unitOfWork.BeginTransactionAsync();
+                try
+                {
+                    var refreshToken = GenerateRefreshToken();
+                    loginResult.RefreshToken = refreshToken!.Token;
+                    loginResult.RefreshTokenExpiration = refreshToken.ExpiresOn;
+                    user.RefreshTokens!.Add(refreshToken);
+                    await _userManager.UpdateAsync(user);
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    return new LoginResult()
+                    {
+                        Success = false,
+                        Error = ex.Message,
+                    };
+                }
             }
 
+            return loginResult;
+        }
+
+        public async Task<LoginResult> RefreshTokenAsync(RequestTokenModel model)
+        {
+            var loginResult = new LoginResult();
+            var principal = GetPrincipalFromExpiredToken(model.ExpiredToken);
+            var username = principal.Identity!.Name;
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null)
+            {
+                loginResult.Success = false;
+                loginResult.Error = "Invalid Token!";
+                return loginResult;
+            }
+
+            var refToken = user.RefreshTokens!.SingleOrDefault(t => t.Token == model.RefreshToken);
+            if (refToken == null)
+            {
+                loginResult.Success = false;
+                loginResult.Error = "Token is null";
+                return loginResult;
+            }
+            if (!refToken.IsActive)
+            {
+                loginResult.Success = false;
+                loginResult.Error = "InActive Token!";
+                return loginResult;
+            }
+            loginResult.Token = GenerateToken(principal.Claims);
+            loginResult.Success = true;
+            if (refToken.ExpiresOn - refToken.CreatedAt < TimeSpan.FromDays(30))
+            {
+                refToken.RevokedOn = DateTime.Now;
+                var newRefreshToken = GenerateRefreshToken();
+                loginResult.RefreshToken = newRefreshToken.Token;
+                loginResult.RefreshTokenExpiration = newRefreshToken.ExpiresOn;
+            }
+
+            loginResult.RefreshToken = refToken.Token;
+            loginResult.RefreshTokenExpiration = refToken.ExpiresOn;
             return loginResult;
         }
 
@@ -167,5 +224,25 @@ namespace Application.Services
                 CreatedAt = DateTime.Now,
             };
         }
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = false, // Bypass expiration check
+                ValidIssuer = _configuration["Jwt:ValidIssuer"],
+                ValidAudience = _configuration["Jwt:ValidAudience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!))
+            };
+
+
+            ClaimsPrincipal? principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out _);
+
+            return principal;
+        }
+
     }
 }

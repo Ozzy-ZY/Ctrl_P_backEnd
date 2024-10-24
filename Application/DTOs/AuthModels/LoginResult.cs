@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Application.Helpers
+namespace Application.DTOs.AuthModels
 {
     public class LoginResult
     {

@@ -68,9 +68,44 @@ namespace API.Controllers
             var result = await _authService.LoginAsync(model);
             if (result.Success)
             {
+                if (!string.IsNullOrEmpty(result.RefreshToken))
+                {
+                    SetRefreshTokenToCookie(result.RefreshToken, result.RefreshTokenExpiration);
+                }
                 return Ok(result);
             }
             return BadRequest(result.Error);
+        }
+
+        [HttpPost("RefreshToken")]
+        public async Task<IActionResult> RefreshToken(RequestTokenModel model)
+        {
+            model.RefreshToken = Uri.UnescapeDataString(model.RefreshToken);
+            var result =  await _authService.RefreshTokenAsync(model);
+            if (result.Success)
+            {
+                if (!string.IsNullOrEmpty(result.RefreshToken))
+                {
+                    SetRefreshTokenToCookie(result.RefreshToken, result.RefreshTokenExpiration);
+                }
+
+                return Ok(result);
+            }
+
+            return BadRequest(result.Error);
+        }
+
+        private void SetRefreshTokenToCookie(string refreshToken, DateTime expiry)
+        {
+            var cookieOption = new CookieOptions()
+            {
+                HttpOnly = true,
+                Expires = expiry.ToLocalTime(),
+                Secure = false,
+                IsEssential = true,
+                SameSite = SameSiteMode.None
+            };
+            Response.Cookies.Append("refreshToken",refreshToken,cookieOption);
         }
     }
 }
