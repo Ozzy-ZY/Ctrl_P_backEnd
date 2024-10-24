@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.DTOs
+namespace Application.DTOs.AuthModels
 {
     public class AppUserRegisterationDto(string UserName, string Email, string Password)
     {

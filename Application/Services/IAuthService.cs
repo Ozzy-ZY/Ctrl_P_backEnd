@@ -1,4 +1,4 @@
-﻿using Application.DTOs;
+﻿using Application.DTOs.AuthModels;
 using Application.Helpers;
 using System;
 using System.Collections.Generic;
@@ -10,8 +10,8 @@ namespace Application.Services
 {
     public interface IAuthService
     {
-        public Task<Result> RegistrationAsync(AppUserRegisterationDto model, string role);
+        public Task<RegisterResult> RegistrationAsync(AppUserRegisterationDto model, string role);
 
-        public Task<Result> LoginAsync(AppUserLoginDto model);
+        public Task<LoginResult> LoginAsync(AppUserLoginDto model);
     }
 }

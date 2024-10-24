@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using Application.DTOs.AuthModels;
+using Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

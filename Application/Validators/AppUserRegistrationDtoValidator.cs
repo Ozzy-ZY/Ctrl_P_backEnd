@@ -1,4 +1,4 @@
-﻿using Application.DTOs;
+﻿using Application.DTOs.AuthModels;
 using FluentValidation;
 using System;
 using System.Collections.Generic;

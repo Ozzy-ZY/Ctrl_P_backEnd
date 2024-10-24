@@ -24,19 +24,19 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.AddColumn<int>(
                 name: "UserId",
-                table: "Addresss",
+                table: "Addresses",
                 type: "int",
                 nullable: false,
                 defaultValue: 0);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Addresss_UserId",
-                table: "Addresss",
+                table: "Addresses",
                 column: "UserId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Addresss_AspNetUsers_UserId",
-                table: "Addresss",
+                table: "Addresses",
                 column: "UserId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id",
@@ -48,15 +48,15 @@ namespace Infrastructure.Migrations
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_Addresss_AspNetUsers_UserId",
-                table: "Addresss");
+                table: "Addresses");
 
             migrationBuilder.DropIndex(
                 name: "IX_Addresss_UserId",
-                table: "Addresss");
+                table: "Addresses");
 
             migrationBuilder.DropColumn(
                 name: "UserId",
-                table: "Addresss");
+                table: "Addresses");
 
             migrationBuilder.AddColumn<int>(
                 name: "AddressId",
@@ -75,7 +75,7 @@ namespace Infrastructure.Migrations
                 name: "FK_AspNetUsers_Addresss_AddressId",
                 table: "AspNetUsers",
                 column: "AddressId",
-                principalTable: "Addresss",
+                principalTable: "Addresses",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }

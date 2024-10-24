@@ -12,7 +12,7 @@ namespace Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Addresss",
+                name: "Addresses",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -71,7 +71,7 @@ namespace Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_AspNetUsers_Addresss_AddressId",
                         column: x => x.AddressId,
-                        principalTable: "Addresss",
+                        principalTable: "Addresses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -253,7 +253,7 @@ namespace Infrastructure.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Addresss");
+                name: "Addresses");
         }
     }
 }

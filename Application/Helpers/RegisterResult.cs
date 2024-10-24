@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Helpers
 {
-    public class Result
+    public class RegisterResult
     {
         public bool Success { get; set; }
         public string? Message { get; set; }

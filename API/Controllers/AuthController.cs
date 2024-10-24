@@ -1,4 +1,4 @@
-﻿using Application.DTOs;
+﻿using Application.DTOs.AuthModels;
 using Application.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -68,9 +68,9 @@ namespace API.Controllers
             var result = await _authService.LoginAsync(model);
             if (result.Success)
             {
-                return Ok(result.Message);
+                return Ok(result);
             }
-            return BadRequest(result.Message);
+            return BadRequest(result.Error);
         }
     }
 }
