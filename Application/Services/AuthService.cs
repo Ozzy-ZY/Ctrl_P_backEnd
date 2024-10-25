@@ -53,9 +53,10 @@ namespace Application.Services
             try
             {
                 var user = model.AsAppUser();
-
-                if (!(await _userManager.CreateAsync(user, model.Password)).Succeeded)
+                var userCreation = await _userManager.CreateAsync(user, model.Password);
+                if (!userCreation.Succeeded)
                 {
+                    transaction.Rollback();
                     return new RegisterResult { Success = false, Message = "Error Creating User" };
                 }
 
@@ -69,19 +70,18 @@ namespace Application.Services
                     }
                 }
 
-                await _unitOfWork.CommitAsync();
                 await _userManager.AddToRoleAsync(user, role);
-
+                transaction.Commit();
                 return new RegisterResult { Success = true, Message = "Successful Registration" };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 transaction.Rollback();
                 return new RegisterResult { Success = false, Message = $"Registration failed: {ex.Message}" };
             }
         }
 
-    public async Task<LoginResult> LoginAsync(AppUserLoginDto model)
+        public async Task<LoginResult> LoginAsync(AppUserLoginDto model)
         {
             var user = await _userManager.FindByNameAsync(model.UserName);
             var loginResult = new LoginResult()
@@ -104,7 +104,7 @@ namespace Application.Services
 
             authClaims.AddRange(userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
             var token = GenerateToken(authClaims);
-            loginResult.Token = token; 
+            loginResult.Token = token;
             loginResult.Success = true;
             loginResult.Error = null;
             if (user.RefreshTokens!.Any(t => t.IsActive))
@@ -224,6 +224,7 @@ namespace Application.Services
                 CreatedAt = DateTime.Now,
             };
         }
+
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -238,11 +239,9 @@ namespace Application.Services
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!))
             };
 
-
             ClaimsPrincipal? principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out _);
 
             return principal;
         }
-
     }
 }
