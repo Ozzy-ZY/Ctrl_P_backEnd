@@ -12,6 +12,9 @@ namespace Application.Services
         public Task<RegisterResult> RegistrationAsync(AppUserRegisterationDto model, string role);
 
         public Task<LoginResult> LoginAsync(AppUserLoginDto model);
+
         public Task<LoginResult> RefreshTokenAsync(RequestTokenModel model);
+
+        public Task<LoginResult> RevokeTokenAsync(RequestTokenModel model);
     }
 }

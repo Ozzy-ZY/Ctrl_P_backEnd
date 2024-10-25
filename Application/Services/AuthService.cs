@@ -139,12 +139,43 @@ namespace Application.Services
             return loginResult;
         }
 
+        public async Task<LoginResult> RevokeTokenAsync(RequestTokenModel model)
+        {
+            var LogoutResult = new LoginResult();
+            var user = await _userManager.Users
+                .SingleOrDefaultAsync(
+                u => u.RefreshTokens!
+                .Any(t => t.Token == model.RefreshToken));
+            if (user == null)
+            {
+                LogoutResult.Error = "No user has this Refresh Token lol";
+                LogoutResult.Success = false;
+                return LogoutResult;
+            }
+            var refreshToken = user!.RefreshTokens!.Single(t => t.Token == model.RefreshToken);
+            if (!refreshToken.IsActive)
+            {
+                LogoutResult.Error = "Logging out just wait";
+                LogoutResult.Success = false;
+                return LogoutResult;
+            }
+            refreshToken.RevokedOn = DateTime.Now;
+            if (!(await _userManager.UpdateAsync(user)).Succeeded)
+            {
+                LogoutResult.Success = false;
+                LogoutResult.Error = "Problem with updating User";
+                return LogoutResult;
+            }
+            LogoutResult.Success = true;
+            return LogoutResult;
+        }
+
         public async Task<LoginResult> RefreshTokenAsync(RequestTokenModel model)
         {
             var loginResult = new LoginResult();
-            var principal = GetPrincipalFromExpiredToken(model.ExpiredToken);
+            var principal = GetPrincipalFromExpiredToken(model.Token);
             var username = principal.Identity!.Name;
-            var user = await _userManager.FindByNameAsync(username);
+            var user = await _userManager.FindByNameAsync(username!);
             if (user == null)
             {
                 loginResult.Success = false;
@@ -166,14 +197,13 @@ namespace Application.Services
                 return loginResult;
             }
             loginResult.Token = GenerateToken(principal.Claims);
+            var newRefreshToken = GenerateRefreshToken();
+            user.RefreshTokens!.Add(newRefreshToken);
+            await _userManager.UpdateAsync(user);
             loginResult.Success = true;
-            if (refToken.ExpiresOn - refToken.CreatedAt < TimeSpan.FromDays(30))
-            {
-                refToken.RevokedOn = DateTime.Now;
-                var newRefreshToken = GenerateRefreshToken();
-                loginResult.RefreshToken = newRefreshToken.Token;
-                loginResult.RefreshTokenExpiration = newRefreshToken.ExpiresOn;
-            }
+            refToken.RevokedOn = DateTime.Now;
+            loginResult.RefreshToken = newRefreshToken.Token;
+            loginResult.RefreshTokenExpiration = newRefreshToken.ExpiresOn;
 
             loginResult.RefreshToken = refToken.Token;
             loginResult.RefreshTokenExpiration = refToken.ExpiresOn;
@@ -220,7 +250,7 @@ namespace Application.Services
             return new RefreshToken()
             {
                 Token = Convert.ToBase64String(randomArr),
-                ExpiresOn = DateTime.Now.AddMonths(int.Parse(_configuration["Jwt:RefreshTokenExpiryMonths"]!)),
+                ExpiresOn = DateTime.Now.AddHours(int.Parse(_configuration["Jwt:RefreshTokenExpiryHours"]!)),
                 CreatedAt = DateTime.Now,
             };
         }

@@ -8,7 +8,7 @@ namespace Application.DTOs.AuthModels
 {
     public class RequestTokenModel
     {
-        public string ExpiredToken { get; set; }
-        public string RefreshToken {get; set; }
+        public string Token { get; set; }
+        public string RefreshToken { get; set; }
     }
 }
