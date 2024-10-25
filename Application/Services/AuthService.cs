@@ -155,7 +155,7 @@ namespace Application.Services
             var refreshToken = user!.RefreshTokens!.Single(t => t.Token == model.RefreshToken);
             if (!refreshToken.IsActive)
             {
-                LogoutResult.Error = "Logging out just wait";
+                LogoutResult.Error = "Already Revoked";
                 LogoutResult.Success = false;
                 return LogoutResult;
             }
@@ -199,7 +199,6 @@ namespace Application.Services
             loginResult.Token = GenerateToken(principal.Claims);
             var newRefreshToken = GenerateRefreshToken();
             user.RefreshTokens!.Add(newRefreshToken);
-            await _userManager.UpdateAsync(user);
             loginResult.Success = true;
             refToken.RevokedOn = DateTime.Now;
             loginResult.RefreshToken = newRefreshToken.Token;
@@ -207,6 +206,7 @@ namespace Application.Services
 
             loginResult.RefreshToken = refToken.Token;
             loginResult.RefreshTokenExpiration = refToken.ExpiresOn;
+            await _userManager.UpdateAsync(user);
             return loginResult;
         }
 

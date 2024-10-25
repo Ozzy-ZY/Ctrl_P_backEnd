@@ -58,7 +58,6 @@ namespace API.Controllers
         }
 
         [HttpPost("Login")]
-        [Authorize]
         public async Task<IActionResult> Login(AppUserLoginDto model)
         {
             var modelState = await _validatorLogin.ValidateAsync(model);
