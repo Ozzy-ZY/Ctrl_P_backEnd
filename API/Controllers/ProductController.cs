@@ -3,9 +3,7 @@ using Application.Services;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace API.Controllers
 {
@@ -23,14 +21,14 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProduct([FromBody] ProductDTO productDTO)
+        public async Task<IActionResult> CreateProduct([FromBody] ProductDTO productDto)
         {
-            ValidationResult result = await _validator.ValidateAsync(productDTO);
+            ValidationResult result = await _validator.ValidateAsync(productDto);
             if (!result.IsValid)
             {
                 return BadRequest(result.Errors);
             }
-            return Ok(await _productService.CreateProductAsync(productDTO));
+            return Ok(await _productService.CreateProductAsync(productDto));
         }
 
         [HttpGet]

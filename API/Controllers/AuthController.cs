@@ -2,8 +2,6 @@
 using Application.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -108,11 +106,7 @@ namespace API.Controllers
             }
             return BadRequest(result.Error);
         }
-
-        private void RemoveRefreshTokenFromCookie(string refreshToken)
-        {
-            Response.Cookies.Delete(refreshToken);
-        }
+        
 
         private void SetRefreshTokenToCookie(string refreshToken, DateTime expiry)
         {

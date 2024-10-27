@@ -3,18 +3,13 @@ using Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.IdentityModel.JsonWebTokens;
 using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 using Application.DTOs.AuthModels;
 using Infrastructure.DataAccess;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -119,7 +114,7 @@ namespace Application.Services
                 try
                 {
                     var refreshToken = GenerateRefreshToken();
-                    loginResult.RefreshToken = refreshToken!.Token;
+                    loginResult.RefreshToken = refreshToken.Token;
                     loginResult.RefreshTokenExpiration = refreshToken.ExpiresOn;
                     user.RefreshTokens!.Add(refreshToken);
                     await _userManager.UpdateAsync(user);
@@ -141,33 +136,33 @@ namespace Application.Services
 
         public async Task<LoginResult> RevokeTokenAsync(RequestTokenModel model)
         {
-            var LogoutResult = new LoginResult();
+            var logoutResult = new LoginResult();
             var user = await _userManager.Users
                 .SingleOrDefaultAsync(
                 u => u.RefreshTokens!
                 .Any(t => t.Token == model.RefreshToken));
             if (user == null)
             {
-                LogoutResult.Error = "No user has this Refresh Token lol";
-                LogoutResult.Success = false;
-                return LogoutResult;
+                logoutResult.Error = "No user has this Refresh Token lol";
+                logoutResult.Success = false;
+                return logoutResult;
             }
-            var refreshToken = user!.RefreshTokens!.Single(t => t.Token == model.RefreshToken);
+            var refreshToken = user.RefreshTokens!.Single(t => t.Token == model.RefreshToken);
             if (!refreshToken.IsActive)
             {
-                LogoutResult.Error = "Already Revoked";
-                LogoutResult.Success = false;
-                return LogoutResult;
+                logoutResult.Error = "Already Revoked";
+                logoutResult.Success = false;
+                return logoutResult;
             }
             refreshToken.RevokedOn = DateTime.Now;
             if (!(await _userManager.UpdateAsync(user)).Succeeded)
             {
-                LogoutResult.Success = false;
-                LogoutResult.Error = "Problem with updating User";
-                return LogoutResult;
+                logoutResult.Success = false;
+                logoutResult.Error = "Problem with updating User";
+                return logoutResult;
             }
-            LogoutResult.Success = true;
-            return LogoutResult;
+            logoutResult.Success = true;
+            return logoutResult;
         }
 
         public async Task<LoginResult> RefreshTokenAsync(RequestTokenModel model)
@@ -213,7 +208,8 @@ namespace Application.Services
         private string GenerateToken(IEnumerable<Claim> claims)
         {
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!));
-            var roleClaim = claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            var listOfClaims = claims.ToList();
+            var roleClaim = listOfClaims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
             // configure based on Role
             var expiryMinutes = roleClaim switch
             {
@@ -227,7 +223,7 @@ namespace Application.Services
                 Audience = _configuration["Jwt:ValidAudience"],
                 Expires = DateTime.UtcNow.AddMinutes(expiryMinutes),// should Always be there temporarily
                 SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256),
-                Subject = new ClaimsIdentity(claims)
+                Subject = new ClaimsIdentity(listOfClaims)
             };
             var tokenHandler = new JsonWebTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);

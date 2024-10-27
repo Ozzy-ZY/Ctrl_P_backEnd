@@ -1,10 +1,5 @@
 using Application;
-using Application.Validators;
-using DataAccess;
-using Infrastructure.DataAccess;
-using Microsoft.EntityFrameworkCore;
-using FluentValidation;
-using Scalar.AspNetCore;
+using Infrastructure;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
