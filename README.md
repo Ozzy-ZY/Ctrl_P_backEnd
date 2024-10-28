@@ -1,5 +1,27 @@
 # Ctrl+P
-
+> [!IMPORTANT]
+> When in Development please include a File Called appsettings.json to your API Project that should contain similar Data to this
+```{
+  "Logging": {
+    "LogLevel": {
+     "Default": "Information",
+     "Microsoft.AspNetCore": "Warning"
+   }
+ },
+  "Jwt": {
+    "SecretKey": "A json Secret",
+    "ValidAudience": "doesn't matter",
+    "ValidIssuer": "your url",
+      "AdminExpiryMinutes": 2,
+       "UserExpiryMinutes": 1,
+        "RefreshTokenExpiryHours": 1
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+   "DefaultConnection": "Data Source=Your DB server;Initial Catalog=Ctrl_P;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False"
+  }
+  }
+```
 (Printing Solutions Agency)
 
 **Project overview:** 
