@@ -78,12 +78,16 @@ namespace Application.Services
 
         public async Task<LoginResult> LoginAsync(AppUserLoginDto model)
         {
-            var user = await _userManager.FindByNameAsync(model.UserName);
             var loginResult = new LoginResult()
             {
                 Success = false,
                 Error = "Please Enter Valid Credentials"
             };
+            // used Eager Loading to prevent called the database multiple times for a single query
+            // this fixes a memory Leakage that appeared when trying to log-in multiple times
+            var user = await _userManager.Users
+                .Include(user => user.RefreshTokens)
+                .FirstOrDefaultAsync(user => user.UserName == model.UserName);
 
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
             {
@@ -98,7 +102,7 @@ namespace Application.Services
             };
 
             authClaims.AddRange(userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
-            var token = GenerateToken(authClaims);
+            var token = GenerateAccessToken(authClaims);
             loginResult.Token = token;
             loginResult.Success = true;
             loginResult.Error = null;
@@ -191,7 +195,7 @@ namespace Application.Services
                 loginResult.Error = "InActive Token!";
                 return loginResult;
             }
-            loginResult.Token = GenerateToken(principal.Claims);
+            loginResult.Token = GenerateAccessToken(principal.Claims);
             var newRefreshToken = GenerateRefreshToken();
             user.RefreshTokens!.Add(newRefreshToken);
             loginResult.Success = true;
@@ -205,7 +209,7 @@ namespace Application.Services
             return loginResult;
         }
 
-        private string GenerateToken(IEnumerable<Claim> claims)
+        private string GenerateAccessToken(IEnumerable<Claim> claims)
         {
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!));
             var listOfClaims = claims.ToList();
