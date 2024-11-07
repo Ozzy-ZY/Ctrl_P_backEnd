@@ -78,6 +78,7 @@ namespace Application.Services
 
         public async Task<LoginResult> LoginAsync(AppUserLoginDto model)
         {
+            var user = await _userManager.FindByNameAsync(model.UserName);
             var loginResult = new LoginResult()
             {
                 Success = false,
@@ -195,6 +196,7 @@ namespace Application.Services
                 loginResult.Error = "InActive Token!";
                 return loginResult;
             }
+
             loginResult.Token = GenerateAccessToken(principal.Claims);
             var newRefreshToken = GenerateRefreshToken();
             user.RefreshTokens!.Add(newRefreshToken);
