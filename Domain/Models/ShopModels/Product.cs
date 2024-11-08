@@ -11,5 +11,8 @@
         public DateTime UpdatedAt { get; set; }
         public string Category { get; set; }
         public string ImageUrl { get; set; }
+        
+        public virtual ICollection<CartItem> CartItems { get; set; }
+
     }
 }

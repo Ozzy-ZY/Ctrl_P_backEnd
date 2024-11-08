@@ -16,9 +16,9 @@ namespace Domain.Models
         [Required]
         [ForeignKey("User")]
         public int UserId { get; set; }
-
-        public virtual AppUser User { get; set; }
         public string StreetName { get; set; }
         public int BuildingNumber { get; set; }
+        public virtual AppUser User { get; set; }
+
     }
 }

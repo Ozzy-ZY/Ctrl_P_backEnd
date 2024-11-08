@@ -10,6 +10,9 @@ namespace Domain.ModelsConfig
         {
             builder.Property(x => x.UserName).HasMaxLength(64).IsRequired();
             builder.HasIndex(x => x.UserName).IsUnique();
+            builder.HasOne(u => u.Cart)
+                .WithOne(c => c.AppUser)
+                .HasForeignKey<Cart>(c => c.UserId);
         }
     }
 }

@@ -7,5 +7,7 @@ namespace Domain.Models
         public override string UserName { get; set; }
 
         public virtual ICollection<RefreshToken>? RefreshTokens { get; set; }
+        public virtual Cart Cart { get; set; }
+
     }
 }

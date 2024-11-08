@@ -1,6 +1,7 @@
 using Application;
 using Infrastructure;
 using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,17 +31,15 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    //app.UseSwagger(options =>
-    //{
-    //    options.RouteTemplate = "openapi/{documentName}.json";
-    //});
-    ////app.MapScalarApiReference(options =>
-    //{
-    //    options.WithTitle("Ctrl+P")
-    //    .WithTheme(ScalarTheme.Mars);
-    //});
+    app.UseSwagger(options =>
+    {
+        options.RouteTemplate = "openapi/{documentName}.json";
+    });
+    app.MapScalarApiReference(options =>
+    {
+        options.WithTitle("Ctrl+P")
+        .WithTheme(ScalarTheme.Mars).WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+    });
 }
 app.UseHttpsRedirection();
 
