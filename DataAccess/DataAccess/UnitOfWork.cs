@@ -12,6 +12,9 @@ namespace Infrastructure.DataAccess
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole<int>> _roleManager;
         public IProductRepository Products { get; set; }
+        public ICartRepository Carts { get; set; }
+        public IServiceRepository Services { get; set; }
+        public ICartItemRepository CartItems { get; set; }
 
         public UnitOfWork(AppDbContext context,
             UserManager<AppUser> userManager,
@@ -21,6 +24,9 @@ namespace Infrastructure.DataAccess
             _userManager = userManager;
             _roleManager = roleManager;
             Products = new ProductRepository(context);
+            Carts = new CartRepository(context);
+            Services = new ServiceRepository(context);
+            CartItems = new CartItemRepository(context);
         }
 
         public async Task<int> CommitAsync()

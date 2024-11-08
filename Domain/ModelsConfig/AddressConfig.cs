@@ -8,6 +8,7 @@ namespace Domain.ModelsConfig
     {
         public void Configure(EntityTypeBuilder<Address> builder)
         {
+            
         }
     }
 }
