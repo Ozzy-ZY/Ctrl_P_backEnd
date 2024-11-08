@@ -1,7 +1,8 @@
 # Ctrl+P
 > [!IMPORTANT]
 > When in Development please include a File Called appsettings.json to your API Project that should contain similar Data to this
-```{
+```
+{
   "Logging": {
     "LogLevel": {
      "Default": "Information",
