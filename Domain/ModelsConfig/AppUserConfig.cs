@@ -8,6 +8,15 @@ namespace Domain.ModelsConfig
     {
         public void Configure(EntityTypeBuilder<AppUser> builder)
         {
+            builder.HasData(
+                new AppUser()
+                {
+                    Id = 1,
+                    Email = "Admin@gmail.com",
+                    UserName = "Admin",
+                    PasswordHash = "AQAAAAIAAYagAAAAEI/Mz/MSiXslOgbOUm8Tk09JnoF8eNvXacynXqq5IcbhSWm2QvhOgm+xDY/URasS6g==",
+                }
+            );
             builder.Property(x => x.UserName).HasMaxLength(64).IsRequired();
             builder.HasIndex(x => x.UserName).IsUnique();
             builder.HasOne(u => u.Cart)
