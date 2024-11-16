@@ -41,6 +41,8 @@ if (app.Environment.IsDevelopment())
         .WithTheme(ScalarTheme.Mars).WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
     });
 }
+
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

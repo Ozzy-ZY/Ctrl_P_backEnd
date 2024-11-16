@@ -10,6 +10,7 @@ namespace Application
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ServicesService>();
             services.AddValidatorsFromAssemblyContaining<ProductDtoValidator>();
             services.AddTransient<IAuthService, AuthService>();
 
