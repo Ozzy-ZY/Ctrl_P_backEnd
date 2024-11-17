@@ -21,8 +21,7 @@ builder.Services.AddSwaggerGen(options =>
     });
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
-builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("DefaultConnection")!,
-    builder.Configuration.GetSection("Jwt"));
+builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddApplication();
 
