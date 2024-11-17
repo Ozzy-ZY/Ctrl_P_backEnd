@@ -30,5 +30,20 @@ namespace Application.Services
             }
             return productsDto;
         }
+        public async Task<int> UpdateProductAsync(ProductDTO dto)
+        {
+            var product = dto.DtoAsProductUpdate();
+            await _unitOfWork.Products.UpdateAsync(product);
+            return await _unitOfWork.CommitAsync();
+        }
+
+        public async Task<int> DeleteProductAsync(ProductDTO dto)
+        {
+            var product = dto.DtoAsProductUpdate();
+            await _unitOfWork.Products.DeleteAsync(product);
+
+            return await _unitOfWork.CommitAsync();
+        }
+
     }
 }
