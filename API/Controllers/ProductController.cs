@@ -32,10 +32,26 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllProducts()
         {
             return Ok(await _productService.GetAllProductsAsync());
+        }
+        [HttpPut("UpdateProduct")]
+        public async Task<IActionResult> UpdateProduct([FromBody] ProductDTO productDto)
+        {
+            ValidationResult result = await _validator.ValidateAsync(productDto);
+            if (!result.IsValid)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok(await _productService.UpdateProductAsync(productDto));
+        }
+        [HttpDelete("DeleteProduct")]
+        public async Task<IActionResult> DeleteProduct([FromBody] ProductDTO productDto)
+        {
+            return Ok(await _productService.DeleteProductAsync(productDto));
         }
     }
 }
