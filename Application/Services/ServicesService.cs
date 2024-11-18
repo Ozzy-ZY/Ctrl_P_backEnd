@@ -33,15 +33,10 @@ public class ServicesService
     {
         // Retrieve the existing service entity from the database by Id
         var existingService = await _unitOfWork.Services.GetAsync(s => s.Id == serviceDTO.Id);
-        if (existingService == null)
-        {
-            throw new InvalidOperationException("Service not found.");
-        }
 
         // Define the upload folder
         string uploadsFolder = Path.Combine(_environment.WebRootPath, "Services");
         Directory.CreateDirectory(uploadsFolder);
-        string imageUrl = existingService.ImageUrl;
         // Update the image if a new one is provided
         if (serviceDTO.Image != null)
         {
