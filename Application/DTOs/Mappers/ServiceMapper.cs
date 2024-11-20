@@ -8,6 +8,7 @@ public static class ServiceMapper
     {
         return new Service
         {
+            Id = serviceDTO.Id,
             Name = serviceDTO.Name,
             Description = serviceDTO.Description,
             ImageUrl = url

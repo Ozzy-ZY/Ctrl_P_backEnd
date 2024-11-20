@@ -18,5 +18,9 @@ public class ServiceController
     {
         return (await _serviceService.AddService(service)).ToString();
     }
-    
+    [HttpPut("api/services/update")]
+    public async Task<ActionResult<string>> UpdateService([FromForm] ServiceDTO service)
+    {
+        return (await _serviceService.UpdateServiceAsync(service)).ToString();
+    }
 }
