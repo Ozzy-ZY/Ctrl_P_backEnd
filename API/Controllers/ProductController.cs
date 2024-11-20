@@ -21,6 +21,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDTO productDto)
         {
             ValidationResult result = await _validator.ValidateAsync(productDto);
@@ -32,12 +33,13 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllProducts()
         {
             return Ok(await _productService.GetAllProductsAsync());
         }
+
         [HttpPut("UpdateProduct")]
+        [Authorize]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductDTO productDto)
         {
             ValidationResult result = await _validator.ValidateAsync(productDto);
@@ -48,7 +50,9 @@ namespace API.Controllers
 
             return Ok(await _productService.UpdateProductAsync(productDto));
         }
+
         [HttpDelete("DeleteProduct")]
+        [Authorize]
         public async Task<IActionResult> DeleteProduct([FromBody] ProductDTO productDto)
         {
             return Ok(await _productService.DeleteProductAsync(productDto));

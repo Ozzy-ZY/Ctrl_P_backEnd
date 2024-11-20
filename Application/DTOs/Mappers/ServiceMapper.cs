@@ -14,4 +14,9 @@ public static class ServiceMapper
             ImageUrl = url
         };
     }
+
+    public static ServiceDTO ToDto(this Service service)
+    {
+        return new ServiceDTO(Id: service.Id, Name: service.Name, Description: service.Description, Image: null!, ImageUrl: service.ImageUrl);
+    }
 }

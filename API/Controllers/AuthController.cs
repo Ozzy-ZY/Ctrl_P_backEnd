@@ -24,6 +24,7 @@ namespace API.Controllers
         }
 
         [HttpPost("RegisterAdmin")]
+        [Authorize]
         public async Task<IActionResult> RegisterAdmin(AppUserRegisterationDto model)
         {
             var modelState = await _validatorRegister.ValidateAsync(model);
@@ -40,6 +41,7 @@ namespace API.Controllers
         }
 
         [HttpPost("RegisterUser")]
+        [Authorize]
         public async Task<IActionResult> RegisterUser(AppUserRegisterationDto model)
         {
             var modelState = await _validatorRegister.ValidateAsync(model);
@@ -56,6 +58,7 @@ namespace API.Controllers
         }
 
         [HttpPost("Login")]
+        [Authorize]
         public async Task<IActionResult> Login(AppUserLoginDto model)
         {
             var modelState = await _validatorLogin.ValidateAsync(model);
@@ -106,7 +109,6 @@ namespace API.Controllers
             }
             return BadRequest(result.Error);
         }
-        
 
         private void SetRefreshTokenToCookie(string refreshToken, DateTime expiry)
         {

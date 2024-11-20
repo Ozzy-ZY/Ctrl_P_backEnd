@@ -28,18 +28,18 @@ builder.Services.AddApplication();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger(options =>
 {
-    app.UseSwagger(options =>
-    {
-        options.RouteTemplate = "openapi/{documentName}.json";
-    });
-    app.MapScalarApiReference(options =>
-    {
-        options.WithTitle("Ctrl+P")
-        .WithTheme(ScalarTheme.Mars).WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
-    });
-}
+    options.RouteTemplate = "openapi/{documentName}.json";
+});
+app.MapScalarApiReference(options =>
+{
+    options.WithTitle("Ctrl+P")
+    .WithTheme(ScalarTheme.Mars).WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+});
+//}
 
 app.UseStaticFiles();
 app.UseHttpsRedirection();

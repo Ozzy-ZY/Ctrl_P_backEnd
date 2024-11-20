@@ -1,10 +1,16 @@
 ﻿using Application.DTOs;
 using Application.Services;
+using FluentValidation;
+using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-public class ServiceController
+[Route("api/[controller]")]
+[ApiController]
+public class ServiceController : ControllerBase
 {
     private readonly ServicesService _serviceService;
 
@@ -13,14 +19,23 @@ public class ServiceController
         _serviceService = serviceService;
     }
 
-    [HttpPost("api/services/add")]
+    [HttpPost("add")]
+    [Authorize]
     public async Task<ActionResult<string>> AddService([FromForm] ServiceDTO service)
     {
         return (await _serviceService.AddService(service)).ToString();
     }
-    [HttpPut("api/services/update")]
+
+    [HttpPut("update")]
+    [Authorize]
     public async Task<ActionResult<string>> UpdateService([FromForm] ServiceDTO service)
     {
         return (await _serviceService.UpdateServiceAsync(service)).ToString();
+    }
+
+    [HttpGet("Get-All")]
+    public async Task<IActionResult> GetAllServices()
+    {
+        return Ok(await _serviceService.GetAllServicesAsync());
     }
 }

@@ -29,6 +29,7 @@ public class ServicesService
         await _unitOfWork.Services.AddAsync(service);
         return await _unitOfWork.CommitAsync();
     }
+
     public async Task<int> UpdateServiceAsync(ServiceDTO serviceDTO)
     {
         // Retrieve the existing service entity from the database by Id
@@ -69,4 +70,15 @@ public class ServicesService
         return await _unitOfWork.CommitAsync();
     }
 
+    public async Task<IEnumerable<ServiceDTO>> GetAllServicesAsync()
+    {
+        var listOfServices = await _unitOfWork.Services.GetAllAsync();
+        List<ServiceDTO> result = new List<ServiceDTO>();
+
+        foreach (var Service in listOfServices)
+        {
+            result.Add(Service.ToDto());
+        }
+        return result;
+    }
 }

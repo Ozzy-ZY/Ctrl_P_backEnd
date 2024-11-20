@@ -2,4 +2,4 @@
 
 namespace Application.DTOs;
 
-public record ServiceDTO(int Id, string Name, string Description, IFormFile Image);
+public record ServiceDTO(int Id, string Name, string Description, IFormFile Image, string? ImageUrl);
