@@ -81,4 +81,21 @@ public class ServicesService
         }
         return result;
     }
+    public async Task<int> DeleteServiceAsync(ServiceDTO serviceDTO)
+    {
+        var existingService = await _unitOfWork.Services.GetAsync(s => s.Id == serviceDTO.Id);
+
+        if (!string.IsNullOrEmpty(existingService.ImageUrl))
+        {
+            var oldImagePath = Path.Combine(_environment.WebRootPath, existingService.ImageUrl.TrimStart('/'));
+            if (File.Exists(oldImagePath))
+            {
+                File.Delete(oldImagePath);
+            }
+        }
+
+        await _unitOfWork.Services.DeleteAsync(existingService);
+        return await _unitOfWork.CommitAsync();
+    }
+
 }
