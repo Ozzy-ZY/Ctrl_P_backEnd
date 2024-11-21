@@ -38,4 +38,10 @@ public class ServiceController : ControllerBase
     {
         return Ok(await _serviceService.GetAllServicesAsync());
     }
+    [HttpDelete("Delete")]
+    [Authorize]
+    public async Task<IActionResult> DeleteService([FromForm] ServiceDTO service)
+    {
+        return Ok(await _serviceService.DeleteServiceAsync(service));
+    }
 }
