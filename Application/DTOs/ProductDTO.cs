@@ -5,6 +5,5 @@
         string Name,
         string Description,
         int UnitsInStock,
-        string Category,
         string ImageUrl);
 }

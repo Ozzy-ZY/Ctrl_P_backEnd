@@ -1,4 +1,6 @@
-﻿namespace Domain.Models
+﻿using Domain.Models.ProductModels;
+
+namespace Domain.Models
 {
     public class Product
     {
@@ -9,9 +11,8 @@
         public int InStockAmount { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public string Category { get; set; }
         public string ImageUrl { get; set; }
-        
+        public virtual ICollection<ProductCategory> ProductCategories { get; set; }
         public virtual ICollection<CartItem> CartItems { get; set; }
 
     }

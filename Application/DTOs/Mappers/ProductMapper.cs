@@ -15,7 +15,6 @@ namespace Application.DTOs.Mappers
                 InStockAmount = dto.UnitsInStock,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
-                Category = dto.Category,
                 ImageUrl = dto.ImageUrl,
             };
         }
@@ -30,7 +29,6 @@ namespace Application.DTOs.Mappers
                 InStock = dto.UnitsInStock > 0 ? true : false,
                 InStockAmount = dto.UnitsInStock,
                 UpdatedAt = DateTime.Now,
-                Category = dto.Category,
                 ImageUrl = dto.ImageUrl,
             };
         }
@@ -42,7 +40,6 @@ namespace Application.DTOs.Mappers
                 Name: product.Name,
                 Description: product.Description,
                 UnitsInStock: product.InStockAmount,
-                Category: product.Category,
                 ImageUrl: product.ImageUrl
                 );
         }
