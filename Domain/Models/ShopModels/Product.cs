@@ -13,6 +13,9 @@ namespace Domain.Models
         public DateTime UpdatedAt { get; set; }
         public string ImageUrl { get; set; }
         public virtual ICollection<ProductCategory> ProductCategories { get; set; }
+        public virtual ICollection<ProductFrame> ProductFrames { get; set; }
+        public virtual ICollection<ProductMaterial> ProductMaterials { get; set; }
+        public virtual ICollection<ProductSize> ProductSizes { get; set; }
         public virtual ICollection<CartItem> CartItems { get; set; }
 
     }
