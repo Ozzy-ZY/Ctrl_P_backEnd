@@ -18,12 +18,12 @@ namespace Infrastructure.DataAccess
         public DbSet<ProductFrame> ProductFrames { get; set; }
         public DbSet<ProductMaterial> ProductMaterials { get; set; }
         public DbSet<ProductSize> ProductSizes { get; set; }
+        public DbSet<ProductPhoto> ProductPhotos { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<AppUser> User { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
-
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
