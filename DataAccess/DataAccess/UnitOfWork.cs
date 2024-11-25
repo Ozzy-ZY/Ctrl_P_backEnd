@@ -3,6 +3,7 @@ using Infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Identity;
 using System.Data;
 using Microsoft.EntityFrameworkCore.Storage;
+using Infrastructure.DataAccess.Repositories.CategorizingModels;
 
 namespace Infrastructure.DataAccess
 {
@@ -14,6 +15,7 @@ namespace Infrastructure.DataAccess
         public IProductRepository Products { get; set; }
         public ICartRepository Carts { get; set; }
         public IServiceRepository Services { get; set; }
+        public ICategoryRepository Categories { get; set; }
         public ICartItemRepository CartItems { get; set; }
 
         public UnitOfWork(AppDbContext context,
@@ -27,6 +29,7 @@ namespace Infrastructure.DataAccess
             Carts = new CartRepository(context);
             Services = new ServiceRepository(context);
             CartItems = new CartItemRepository(context);
+            Categories = new CategoryRepository(context);
         }
 
         public async Task<int> CommitAsync()

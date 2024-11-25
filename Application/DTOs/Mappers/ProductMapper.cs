@@ -1,4 +1,5 @@
 ﻿using Domain.Models;
+using System.Net.NetworkInformation;
 
 namespace Application.DTOs.Mappers
 {
@@ -13,10 +14,11 @@ namespace Application.DTOs.Mappers
                 Description = dto.Description,
                 InStock = dto.UnitsInStock > 0 ? true : false,
                 InStockAmount = dto.UnitsInStock,
+                Price = dto.Price,
+                OldPrice = dto.OldPrice,
+                Sale = dto.Sale,
                 CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
-                Category = dto.Category,
-                ImageUrl = dto.ImageUrl,
+                UpdatedAt = DateTime.Now
             };
         }
 
@@ -29,9 +31,10 @@ namespace Application.DTOs.Mappers
                 Description = dto.Description,
                 InStock = dto.UnitsInStock > 0 ? true : false,
                 InStockAmount = dto.UnitsInStock,
-                UpdatedAt = DateTime.Now,
-                Category = dto.Category,
-                ImageUrl = dto.ImageUrl,
+                Price = dto.Price,
+                OldPrice = dto.OldPrice,
+                Sale = dto.Sale,
+                UpdatedAt = DateTime.Now
             };
         }
 
@@ -42,9 +45,10 @@ namespace Application.DTOs.Mappers
                 Name: product.Name,
                 Description: product.Description,
                 UnitsInStock: product.InStockAmount,
-                Category: product.Category,
-                ImageUrl: product.ImageUrl
-                );
+                Price: product.Price,
+                OldPrice: product.OldPrice,
+                Sale: product.Sale
+            );
         }
     }
 }

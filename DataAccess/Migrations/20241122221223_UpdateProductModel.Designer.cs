@@ -4,6 +4,7 @@ using Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241122221223_UpdateProductModel")]
+    partial class UpdateProductModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -127,7 +130,7 @@ namespace Infrastructure.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a7822b92-1688-47e4-ad18-63017eb07e28",
+                            ConcurrencyStamp = "30e74c61-c9fe-4909-8108-078eb937f082",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
@@ -153,7 +156,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("TotalPrice")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -220,69 +222,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("Categories", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Models.CategorizingModels.Frame", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Frames", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Models.CategorizingModels.Material", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Materials", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Models.CategorizingModels.Size", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Sizes", (string)null);
-                });
-
             modelBuilder.Entity("Domain.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -298,6 +237,10 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(400)");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("InStock")
                         .HasColumnType("bit");
 
@@ -307,23 +250,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal?>("OldPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Price")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Rating")
-                        .ValueGeneratedOnAdd()
-                        .HasPrecision(2, 1)
-                        .HasColumnType("decimal(2,1)")
-                        .HasDefaultValue(0m);
-
-                    b.Property<bool>("Sale")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -349,88 +275,6 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("ProductCategories");
-                });
-
-            modelBuilder.Entity("Domain.Models.ProductModels.ProductFrame", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FrameId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductId", "FrameId");
-
-                    b.HasIndex("FrameId");
-
-                    b.HasIndex("ProductId", "FrameId")
-                        .IsUnique();
-
-                    b.ToTable("ProductFrames");
-                });
-
-            modelBuilder.Entity("Domain.Models.ProductModels.ProductMaterial", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MaterialId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductId", "MaterialId");
-
-                    b.HasIndex("MaterialId");
-
-                    b.HasIndex("ProductId", "MaterialId")
-                        .IsUnique();
-
-                    b.ToTable("ProductMaterials");
-                });
-
-            modelBuilder.Entity("Domain.Models.ProductModels.ProductPhoto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductPhotos");
-                });
-
-            modelBuilder.Entity("Domain.Models.ProductModels.ProductSize", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SizeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductId", "SizeId");
-
-                    b.HasIndex("SizeId");
-
-                    b.HasIndex("ProductId", "SizeId")
-                        .IsUnique();
-
-                    b.ToTable("ProductSizes");
                 });
 
             modelBuilder.Entity("Domain.Models.Service", b =>
@@ -695,74 +539,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Domain.Models.ProductModels.ProductFrame", b =>
-                {
-                    b.HasOne("Domain.Models.CategorizingModels.Frame", "Frame")
-                        .WithMany("ProductFrames")
-                        .HasForeignKey("FrameId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.Product", "Product")
-                        .WithMany("ProductFrames")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Frame");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Domain.Models.ProductModels.ProductMaterial", b =>
-                {
-                    b.HasOne("Domain.Models.CategorizingModels.Material", "Material")
-                        .WithMany("ProductMaterials")
-                        .HasForeignKey("MaterialId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.Product", "Product")
-                        .WithMany("ProductMaterials")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Material");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Domain.Models.ProductModels.ProductPhoto", b =>
-                {
-                    b.HasOne("Domain.Models.Product", "Product")
-                        .WithMany("ProductPhotos")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Domain.Models.ProductModels.ProductSize", b =>
-                {
-                    b.HasOne("Domain.Models.Product", "Product")
-                        .WithMany("ProductSizes")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.CategorizingModels.Size", "Size")
-                        .WithMany("ProductSizes")
-                        .HasForeignKey("SizeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("Size");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
@@ -832,34 +608,11 @@ namespace Infrastructure.Migrations
                     b.Navigation("ProductCategories");
                 });
 
-            modelBuilder.Entity("Domain.Models.CategorizingModels.Frame", b =>
-                {
-                    b.Navigation("ProductFrames");
-                });
-
-            modelBuilder.Entity("Domain.Models.CategorizingModels.Material", b =>
-                {
-                    b.Navigation("ProductMaterials");
-                });
-
-            modelBuilder.Entity("Domain.Models.CategorizingModels.Size", b =>
-                {
-                    b.Navigation("ProductSizes");
-                });
-
             modelBuilder.Entity("Domain.Models.Product", b =>
                 {
                     b.Navigation("CartItems");
 
                     b.Navigation("ProductCategories");
-
-                    b.Navigation("ProductFrames");
-
-                    b.Navigation("ProductMaterials");
-
-                    b.Navigation("ProductPhotos");
-
-                    b.Navigation("ProductSizes");
                 });
 #pragma warning restore 612, 618
         }

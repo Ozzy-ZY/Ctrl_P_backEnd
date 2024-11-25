@@ -13,5 +13,8 @@ public class CartConfig:IEntityTypeConfiguration<Cart>
         builder.HasMany(c=> c.CartItems)
             .WithOne(i => i.Cart)
             .HasForeignKey(i => i.CartId);
+        builder.Property(c => c.TotalPrice)
+    .HasPrecision(18, 2); // Example: Precision 18, scale 2
+
     }
 }
