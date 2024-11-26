@@ -18,6 +18,10 @@ public class CartService
     public async Task<CartDTO> GetCartWithItemsAsync(int userId)
     {
         var cart = await _unitOfWork.Carts.GetCartWithItemsAsync(userId);
+        if (cart == null)
+        {
+            return null!;
+        }
         return cart.ToCartDTO();
     }
 

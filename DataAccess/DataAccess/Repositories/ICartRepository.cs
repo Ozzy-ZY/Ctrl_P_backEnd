@@ -4,5 +4,5 @@ namespace Infrastructure.DataAccess.Repositories;
 
 public interface ICartRepository:IGenericRepository<Cart>
 {
-    public Task<Cart> GetCartWithItemsAsync(int userId);
+    public Task<Cart?> GetCartWithItemsAsync(int userId);
 }

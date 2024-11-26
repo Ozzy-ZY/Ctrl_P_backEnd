@@ -45,7 +45,7 @@ namespace Infrastructure.DataAccess.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<T> GetAsync(Expression<Func<T, bool>>? predicate = null, params string[] Includes)
+        public async Task<T?> GetAsync(Expression<Func<T, bool>>? predicate = null, params string[] Includes)
         {
             IQueryable<T> query = dbSet;
 

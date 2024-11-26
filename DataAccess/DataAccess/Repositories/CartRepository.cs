@@ -12,7 +12,7 @@ public class CartRepository:GenericRepository<Cart>,ICartRepository
         _context = context;
     }
 
-    public async Task<Cart> GetCartWithItemsAsync(int userId)
+    public async Task<Cart?> GetCartWithItemsAsync(int userId)
     {
         return (await _context.Carts.Include(c=> c.CartItems)
             .FirstOrDefaultAsync(c => c.UserId == userId))!;

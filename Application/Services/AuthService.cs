@@ -102,6 +102,7 @@ namespace Application.Services
             };
 
             authClaims.AddRange(userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
+            authClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
             var token = GenerateAccessToken(authClaims);
             loginResult.Token = token;
             loginResult.Success = true;
@@ -261,6 +262,7 @@ namespace Application.Services
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
+                NameClaimType = ClaimTypes.NameIdentifier,
                 ValidateAudience = true,
                 ValidateIssuerSigningKey = true,
                 ValidateLifetime = false, // Bypass expiration check
