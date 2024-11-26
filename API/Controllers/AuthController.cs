@@ -24,7 +24,7 @@ namespace API.Controllers
         }
 
         [HttpPost("RegisterAdmin")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RegisterAdmin(AppUserRegisterationDto model)
         {
             var modelState = await _validatorRegister.ValidateAsync(model);
