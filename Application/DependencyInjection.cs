@@ -11,6 +11,10 @@ namespace Application
         {
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ServicesService>();
+<<<<<<< HEAD
+=======
+            services.AddScoped<CartService>();
+>>>>>>> origin/master
             services.AddScoped<CategoryService>(); // Add this line
             services.AddValidatorsFromAssemblyContaining<ProductDtoValidator>();
             services.AddTransient<IAuthService, AuthService>();

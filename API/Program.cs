@@ -37,7 +37,7 @@ app.UseSwagger(options =>
 app.MapScalarApiReference(options =>
 {
     options.WithTitle("Ctrl+P")
-    .WithTheme(ScalarTheme.Mars).WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+    .WithTheme(ScalarTheme.BluePlanet).WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
 });
 //}
 
