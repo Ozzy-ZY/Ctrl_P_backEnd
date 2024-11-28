@@ -3,6 +3,7 @@ using Application.DTOs.Mappers;
 using Domain.Models;
 using Infrastructure.DataAccess;
 using Infrastructure.DataAccess.Repositories;
+using Microsoft.VisualBasic;
 
 namespace Application.Services;
 
@@ -17,96 +18,59 @@ public class CartService
 
     public async Task<CartDTO> GetCartWithItemsAsync(int userId)
     {
-        var cart = await _unitOfWork.Carts.GetCartWithItemsAsync(userId);
-        if (cart == null)
-        {
-            return null!;
-        }
-        return cart.ToCartDTO();
+        var cart = await _unitOfWork.Carts.GetAsync(c => c.UserId == userId, c => c.CartItems);
+        return cart?.ToCartDTO()!;
     }
     public class AddToCartResult
     {
         public bool Success { get; set; }
         public List<string> Errors { get; set; } = new List<string>();
     }
-       public async Task<AddToCartResult> AddToCartAsync(int userId, AddToCartDTO addToCartDTO)
+
+    public async Task<AddToCartResult> AddToCartAsync(int userId, AddToCartDTO addToCartDTO)
     {
-        var result = new AddToCartResult();
-
-        try
+        AddToCartResult result = new AddToCartResult();
+        var product = await _unitOfWork.Products.GetAsync(p => p.Id == addToCartDTO.ProductId);
+        if (addToCartDTO.Quantity > product!.InStockAmount)
         {
-            // Validate input
-            if (addToCartDTO == null)
-            {
-                result.Errors.Add("Cart item cannot be null");
-                return result;
-            }
-
-            if (addToCartDTO.Quantity <= 0)
-            {
-                result.Errors.Add("Quantity must be greater than zero");
-                return result;
-            }
-
-            // Retrieve product
-            var product = await _unitOfWork.Products.GetAsync(p => p.Id == addToCartDTO.ProductId);
-            if (product == null)
-            {
-                result.Errors.Add($"Product with ID {addToCartDTO.ProductId} not found");
-                return result;
-            }
-
-            // Check product availability
-            if (product.InStockAmount < addToCartDTO.Quantity)
-            {
-                result.Errors.Add($"Insufficient stock. Only {product.InStockAmount} items available");
-                return result;
-            }
-
-            // Retrieve or create cart
-            var cart = await _unitOfWork.Carts.GetCartWithItemsAsync(userId);
-            if (cart == null)
-            {
-                cart = new Cart { UserId = userId };
-                await _unitOfWork.Carts.AddAsync(cart);
-            }
-
-            // Check for existing cart item
-            var cartItem = cart.CartItems.FirstOrDefault(ci => ci.ProductId == addToCartDTO.ProductId);
-            
-            // Validate total quantity
-            var totalRequestedQuantity = addToCartDTO.Quantity + 
-                (cartItem?.Quantity ?? 0);
-            
-            if (totalRequestedQuantity > product.InStockAmount)
-            {
-                result.Errors.Add($"Cannot add {addToCartDTO.Quantity} items. Total would exceed available stock of {product.InStockAmount}");
-                return result;
-            }
-
-            // Add or update cart item
-            if (cartItem == null)
-            {
-                cartItem = addToCartDTO.ToCartItem(cart.Id);
-                cart.CartItems.Add(cartItem);
-            }
-            else
-            {
-                cartItem.Quantity += addToCartDTO.Quantity;
-            }
-
-            // Save changes
-            await _unitOfWork.Carts.UpdateAsync(cart);
-            await _unitOfWork.CommitAsync();
-
+            result.Success = false;
+            result.Errors.Add("Quantity must be greater than the product's Stock");
+            return result;
+        }
+        // get the user's cart
+        var cart = await _unitOfWork.Carts.GetCartWithItemsAsync(userId);
+        if (cart == null)
+            return result;
+        // check if the cart item already exists
+        var existingCartItem = await _unitOfWork.CartItems.GetAsync(i => (i.CartId == cart!.Id && i.ProductId == addToCartDTO.ProductId));
+        if (existingCartItem == null)
+        {
+            existingCartItem = addToCartDTO.ToCartItem(cart!.Id);
+            await _unitOfWork.CartItems.AddAsync(existingCartItem);
+        }
+        else
+        {
+            existingCartItem.Quantity += addToCartDTO.Quantity;
+            product!.InStockAmount -= addToCartDTO.Quantity;
+            await _unitOfWork.Products.UpdateAsync(product);
+            await _unitOfWork.CartItems.UpdateAsync(existingCartItem);
+        }
+        if (await _unitOfWork.CommitAsync() > 0)
+        {
             result.Success = true;
             return result;
         }
-        catch (Exception ex)
-        {
-            result.Errors.Add("An unexpected error occurred while adding item to cart");
-            
-            return result;
-        }
+        
+        result.Errors.Add("Unable to add product");
+        result.Success = false;
+        return result;
     }
+
+    // public async Task<bool> RemoveFromCartAsync(int userId, AddToCartDTO addToCartDTO)
+    // {
+    //     var cart = await _unitOfWork.Carts.GetCartWithItemsAsync(userId);
+    //     if(cart == null)
+    //         return false;
+    //     var cartItem = await _unitOfWork.CartItems.GetAsync();
+    // }
 }

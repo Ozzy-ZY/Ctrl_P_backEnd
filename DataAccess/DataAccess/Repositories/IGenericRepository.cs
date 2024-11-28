@@ -11,9 +11,10 @@ namespace Infrastructure.DataAccess.Repositories
     public interface IGenericRepository<T>
         where T : class
     {
-        public Task<T?> GetAsync(Expression<Func<T, bool>>? predicate = null, params string[] Includes);
+        public Task<T?> GetAsync(Expression<Func<T, bool>>? predicate = null, params Expression<Func<T, object>>[] includeProperties);
 
-        public Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, params string[] Includes);
+        public Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null,
+            params Expression<Func<T, object>>[] includeProperties);
 
         public Task AddAsync(T Entity);
 

@@ -12,6 +12,7 @@ using Application.DTOs.AuthModels;
 using Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
+using Infrastructure.DataAccess.Repositories;
 
 namespace Application.Services
 {
@@ -21,7 +22,6 @@ namespace Application.Services
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole<int>> _roleManager;
         private readonly IConfiguration _configuration;
-
         public AuthService(UserManager<AppUser> userManager,
             RoleManager<IdentityRole<int>> roleManager,
             IConfiguration configuration,
@@ -66,6 +66,19 @@ namespace Application.Services
                 }
 
                 await _userManager.AddToRoleAsync(user, role);
+                if (role == "User")
+                {
+                    await _unitOfWork.Carts.AddAsync(new Cart()
+                        {
+                            UserId = user.Id,
+                            TotalPrice = 0,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            IsActive = true
+                        });
+                }
+
+                await _unitOfWork.CommitAsync();
                 transaction.Commit();
                 return new RegisterResult { Success = true, Message = "Successful Registration" };
             }
