@@ -47,6 +47,7 @@ public class CartService
         {
             existingCartItem = addToCartDTO.ToCartItem(cart!.Id);
             await _unitOfWork.CartItems.AddAsync(existingCartItem);
+            cart.TotalPrice += addToCartDTO.Quantity * product!.Price;
         }
         else
         {
@@ -55,6 +56,8 @@ public class CartService
             await _unitOfWork.Products.UpdateAsync(product);
             await _unitOfWork.CartItems.UpdateAsync(existingCartItem);
         }
+        cart.TotalPrice += addToCartDTO.Quantity * product!.Price;
+        await _unitOfWork.Carts.UpdateAsync(cart);
         if (await _unitOfWork.CommitAsync() > 0)
         {
             result.Success = true;
@@ -66,11 +69,20 @@ public class CartService
         return result;
     }
 
-    // public async Task<bool> RemoveFromCartAsync(int userId, AddToCartDTO addToCartDTO)
-    // {
-    //     var cart = await _unitOfWork.Carts.GetCartWithItemsAsync(userId);
-    //     if(cart == null)
-    //         return false;
-    //     var cartItem = await _unitOfWork.CartItems.GetAsync();
-    // }
+    public async Task<bool> RemoveFromCartAsync(int userId, AddToCartDTO addToCartDTO)
+    {
+        var cart = await _unitOfWork.Carts.GetCartWithItemsAsync(userId);
+        if(cart == null)
+            return false;
+        var cartItem = await _unitOfWork.CartItems.GetAsync(ci => ci.CartId == cart.Id);
+        if (cartItem == null)
+            return false;
+        await _unitOfWork.CartItems.DeleteAsync(cartItem!);
+        var product = await _unitOfWork.Products.GetAsync(p => p.Id == addToCartDTO.ProductId);
+        product!.InStockAmount += addToCartDTO.Quantity;
+        await _unitOfWork.Products.UpdateAsync(product);
+        if (await _unitOfWork.CommitAsync() > 0)
+            return true;
+        return false;
+    }
 }
