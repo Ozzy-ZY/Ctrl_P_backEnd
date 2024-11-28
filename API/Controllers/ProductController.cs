@@ -21,7 +21,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDTO productDto)
         {
             ValidationResult result = await _validator.ValidateAsync(productDto);
@@ -39,7 +39,7 @@ namespace API.Controllers
         }
 
         [HttpPut("UpdateProduct")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductDTO productDto)
         {
             ValidationResult result = await _validator.ValidateAsync(productDto);

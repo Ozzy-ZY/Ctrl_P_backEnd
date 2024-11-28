@@ -32,28 +32,28 @@ namespace Infrastructure.DataAccess.Repositories
             return Task.CompletedTask;
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, params string[] Includes)
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null,params Expression<Func<T, object>>[] includeProperties)
         {
             IQueryable<T> query = dbSet;
 
             if (predicate != null)
                 query = query.Where(predicate);
-            foreach (var include in Includes)
+            foreach (var include in includeProperties)
             {
-                query.Include(include);
+                await query.Include(include).LoadAsync();
             }
             return await query.ToListAsync();
         }
 
-        public async Task<T?> GetAsync(Expression<Func<T, bool>>? predicate = null, params string[] Includes)
+        public async Task<T?> GetAsync(Expression<Func<T, bool>>? predicate = null, params Expression<Func<T, object>>[] includeProperties)
         {
             IQueryable<T> query = dbSet;
 
             if (predicate != null)
                 query = query.Where(predicate);
-            foreach (var include in Includes)
+            foreach (var include in includeProperties)
             {
-                query.Include(include);
+                await query.Include(include).LoadAsync();
             }
             return await query.FirstOrDefaultAsync();
         }
