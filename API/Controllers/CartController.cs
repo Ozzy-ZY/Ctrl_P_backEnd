@@ -41,4 +41,12 @@ public class CartController: ControllerBase
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
         return Ok(await _cartService.RemoveFromCartAsync(userId, request));
     }
+
+    [HttpDelete("EmptyTheCart")]
+    [Authorize(Roles = "Admin, User")]
+    public async Task<IActionResult> EmptyTheCart()
+    {
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+        return Ok(await _cartService.EmptyTheCart(userId));
+    }
 }

@@ -21,5 +21,6 @@ namespace Infrastructure.DataAccess.Repositories
         public Task UpdateAsync(T Entity);
 
         public Task DeleteAsync(T Entity);
+        public Task DeleteAllAsync(Expression<Func<T, bool>>? predicate = null);
     }
 }

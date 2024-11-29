@@ -32,6 +32,19 @@ namespace Infrastructure.DataAccess.Repositories
             return Task.CompletedTask;
         }
 
+        public Task DeleteAllAsync(Expression<Func<T, bool>>? predicate = null)
+        {
+            if (predicate != null)
+            {
+                dbSet.RemoveRange(dbSet.Where(predicate));
+            }
+            else
+            {
+                dbSet.RemoveRange(dbSet);
+            }
+            return Task.CompletedTask;
+        }
+
         public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null,params Expression<Func<T, object>>[] includeProperties)
         {
             IQueryable<T> query = dbSet;
