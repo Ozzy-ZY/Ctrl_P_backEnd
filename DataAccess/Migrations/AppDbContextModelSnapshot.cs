@@ -127,7 +127,7 @@ namespace Infrastructure.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a7822b92-1688-47e4-ad18-63017eb07e28",
+                            ConcurrencyStamp = "07ed9972-40f1-4845-b3b0-c51e5ac3b847",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
@@ -189,6 +189,12 @@ namespace Infrastructure.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.HasKey("Id");
 
@@ -322,6 +328,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("decimal(2,1)")
                         .HasDefaultValue(0m);
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<bool>("Sale")
                         .HasColumnType("bit");
 
@@ -348,7 +360,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ProductId", "CategoryId")
                         .IsUnique();
 
-                    b.ToTable("ProductCategories");
+                    b.ToTable("ProductCategory");
                 });
 
             modelBuilder.Entity("Domain.Models.ProductModels.ProductFrame", b =>
@@ -366,7 +378,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ProductId", "FrameId")
                         .IsUnique();
 
-                    b.ToTable("ProductFrames");
+                    b.ToTable("ProductFrame");
                 });
 
             modelBuilder.Entity("Domain.Models.ProductModels.ProductMaterial", b =>
@@ -384,7 +396,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ProductId", "MaterialId")
                         .IsUnique();
 
-                    b.ToTable("ProductMaterials");
+                    b.ToTable("ProductMaterial");
                 });
 
             modelBuilder.Entity("Domain.Models.ProductModels.ProductPhoto", b =>
@@ -412,7 +424,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductPhotos");
+                    b.ToTable("ProductPhoto");
                 });
 
             modelBuilder.Entity("Domain.Models.ProductModels.ProductSize", b =>
@@ -430,7 +442,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ProductId", "SizeId")
                         .IsUnique();
 
-                    b.ToTable("ProductSizes");
+                    b.ToTable("ProductSize");
                 });
 
             modelBuilder.Entity("Domain.Models.Service", b =>

@@ -1,5 +1,7 @@
 using Application;
+using Delta;
 using Infrastructure;
+using Infrastructure.DataAccess;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using Swashbuckle.AspNetCore.Filters;
@@ -26,7 +28,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
 var app = builder.Build();
-
+app.UseDelta<AppDbContext>();
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{

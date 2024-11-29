@@ -8,6 +8,7 @@ public class CartItem
 {
     [Key]
     public int Id { get; set; }
+    public ulong RowVersion { get; set; }
     
     [Required, ForeignKey("Cart")]
     public int CartId { get; set; }

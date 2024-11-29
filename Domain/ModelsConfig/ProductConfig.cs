@@ -25,6 +25,9 @@ namespace Domain.ModelsConfig
             builder.HasMany(p => p.CartItems)
                 .WithOne(i => i.Product)
                 .HasForeignKey(i => i.ProductId);
+            builder.Property(p => p.RowVersion)
+                .IsRowVersion()
+                .HasConversion<byte[]>();
         }
     }
 
