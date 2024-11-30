@@ -1,11 +1,13 @@
 ﻿using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Models.Pagination;
 
 namespace Infrastructure.DataAccess.Repositories
 {
@@ -43,6 +45,25 @@ namespace Infrastructure.DataAccess.Repositories
                 dbSet.RemoveRange(dbSet);
             }
             return Task.CompletedTask;
+        }
+
+        public async Task<PaginatedList<T>?> GetPaginatedAsync(int pageIndex, int pageSize, Expression<Func<T, bool>>? predicate = null,
+            params Expression<Func<T, object>>[] includeProperties)
+        {
+            IQueryable<T> query = dbSet;
+            if(predicate != null)
+                query = query.Where(predicate);
+            foreach (var include in includeProperties)
+            {
+                await query.Include(include).LoadAsync();
+            }
+            var count = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling((double)count / pageSize);
+            var items = await query
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+            return new PaginatedList<T>(items,pageIndex, totalPages); 
         }
 
         public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null,params Expression<Func<T, object>>[] includeProperties)

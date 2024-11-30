@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Models.Pagination;
 
 namespace Infrastructure.DataAccess.Repositories
 {
@@ -12,6 +13,11 @@ namespace Infrastructure.DataAccess.Repositories
         where T : class
     {
         public Task<T?> GetAsync(Expression<Func<T, bool>>? predicate = null, params Expression<Func<T, object>>[] includeProperties);
+        public Task<PaginatedList<T>?> GetPaginatedAsync(
+            int pageIndex,
+            int pageSize,
+            Expression<Func<T, bool>>? predicate = null,
+            params Expression<Func<T, object>>[] includeProperties);
 
         public Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null,
             params Expression<Func<T, object>>[] includeProperties);

@@ -127,7 +127,7 @@ namespace Infrastructure.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "07ed9972-40f1-4845-b3b0-c51e5ac3b847",
+                            ConcurrencyStamp = "4eb1b14f-5270-444a-9393-4da0781bb0b3",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
@@ -464,6 +464,12 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.HasKey("Id");
 
