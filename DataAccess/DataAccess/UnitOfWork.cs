@@ -16,6 +16,8 @@ namespace Infrastructure.DataAccess
         public ICartRepository Carts { get; set; }
         public IServiceRepository Services { get; set; }
         public ICategoryRepository Categories { get; set; }
+        public OrderRepository Orders { get; set; }
+        public OrderItemRepository OrderItems { get; set; }
         public ICartItemRepository CartItems { get; set; }
 
         public UnitOfWork(AppDbContext context,
@@ -30,6 +32,8 @@ namespace Infrastructure.DataAccess
             Services = new ServiceRepository(context);
             CartItems = new CartItemRepository(context);
             Categories = new CategoryRepository(context);
+            Orders = new OrderRepository(context);
+            OrderItems = new OrderItemRepository(context);
         }
 
         public async Task<int> CommitAsync()

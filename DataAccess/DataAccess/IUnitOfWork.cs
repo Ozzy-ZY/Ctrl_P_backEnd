@@ -11,6 +11,8 @@ namespace Infrastructure.DataAccess
         public IServiceRepository Services { get; set; }
         public ICartItemRepository CartItems { get; set; }
         public ICategoryRepository Categories { get; set; }
+        public OrderRepository Orders { get; set; }
+        public OrderItemRepository OrderItems { get; set; }
 
         public Task<int> CommitAsync();
         public Task<IDbTransaction> BeginTransactionAsync();

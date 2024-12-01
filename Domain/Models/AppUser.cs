@@ -10,6 +10,7 @@ namespace Domain.Models
         public virtual ICollection<Address> Addresses { get; set; }
 
         public virtual Cart Cart { get; set; }
+        public virtual ICollection<Order> Orders { get; set; }
         
 
     }
