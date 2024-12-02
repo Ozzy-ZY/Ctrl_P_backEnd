@@ -22,9 +22,6 @@ namespace Domain.ModelsConfig
                 .IsRequired() // URL is required
                 .HasMaxLength(500); // Limit the length to 500 characters
 
-            builder.Property(p => p.Description)
-                .HasMaxLength(1000); // Optional, but limited to 1000 characters
-
             // Relationships
             builder.HasOne(p => p.Product) // A ProductPhoto belongs to one Product
                 .WithMany(p => p.ProductPhotos) // A Product can have many ProductPhotos

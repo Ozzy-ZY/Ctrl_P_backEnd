@@ -16,11 +16,14 @@ namespace Application.Validators
                 .Length(20, 400).WithMessage("Please enter a description between 20 and 400 characters")
                 .NotEmpty().WithMessage("Please enter a description");
 
-            RuleFor(x => x.OldPrice)
-                .NotNull()
-                .WithMessage("OldPrice is required when Sale is true.")
-                .When(x => x.Sale);
-        }
+            RuleFor(x => x)
+                .Must(x => !x.OldPrice.HasValue || x.OldPrice > x.Price)
+                .When(x => x.OldPrice.HasValue)
+                .WithMessage("Old price must be greater than the current price.");
 
+            RuleFor(x => x.Price)
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("Price cannot be negative.");
+        }
     }
 }

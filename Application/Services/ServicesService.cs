@@ -35,12 +35,12 @@ public class ServicesService
         // Retrieve the existing service entity from the database by Id
         var existingService = await _unitOfWork.Services.GetAsync(s => s.Id == serviceDTO.Id);
 
-        // Define the upload folder
-        string uploadsFolder = Path.Combine(_environment.WebRootPath, "Services");
-        Directory.CreateDirectory(uploadsFolder);
         // Update the image if a new one is provided
         if (serviceDTO.Image != null)
         {
+            // Define the upload folder
+            string uploadsFolder = Path.Combine(_environment.WebRootPath, "Services");
+            Directory.CreateDirectory(uploadsFolder);
             // Delete the old image if it exists
             if (!string.IsNullOrEmpty(existingService.ImageUrl))
             {
