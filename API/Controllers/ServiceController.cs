@@ -34,9 +34,9 @@ public class ServiceController : ControllerBase
     }
 
     [HttpGet("Get-All")]
-    public async Task<IActionResult> GetAllServices()
+    public async Task<IActionResult> GetAllServices(int pageNumber = 1, int pageSize = 5)
     {
-        return Ok(await _serviceService.GetAllServicesAsync());
+        return Ok(await _serviceService.GetAllServicesAsync(pageNumber, pageSize));
     }
     [HttpDelete("Delete")]
     [Authorize]

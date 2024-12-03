@@ -4,11 +4,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Domain.ModelsConfig;
 
-public class CartItemConfig:IEntityTypeConfiguration<CartItem>
+public class OrderConfig: IEntityTypeConfiguration<Order>
 {
-    public void Configure(EntityTypeBuilder<CartItem> builder)
+    public void Configure(EntityTypeBuilder<Order> builder)
     {
-        builder.ToTable("CartItem");
+        builder
+            .HasOne(o => o.AppUser)
+            .WithMany(u => u.Orders)
+            .HasForeignKey(o => o.UserId);
+        
         builder.Property(ci => ci.RowVersion)
             .IsRowVersion()
             .HasConversion<byte[]>();

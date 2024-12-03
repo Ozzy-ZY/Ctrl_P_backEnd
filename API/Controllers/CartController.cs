@@ -25,12 +25,28 @@ public class CartController: ControllerBase
         var cart = await _cartService.GetCartWithItemsAsync(userId);
         return Ok(cart);
     }
-    [HttpPost("GetCartItems")]
+    [HttpPost("AddItemToCart")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Authorize(Roles = "Admin, User")]
     public async Task<IActionResult> AddItemToCart(AddToCartDTO request)
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
         return Ok(await _cartService.AddToCartAsync(userId, request));
+    }
+
+    [HttpPut("RemoveCartItem")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> RemoveItemFromCart(AddToCartDTO request)
+    {
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+        return Ok(await _cartService.RemoveFromCartAsync(userId, request));
+    }
+
+    [HttpDelete("EmptyTheCart")]
+    [Authorize(Roles = "Admin, User")]
+    public async Task<IActionResult> EmptyTheCart()
+    {
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+        return Ok(await _cartService.EmptyTheCart(userId));
     }
 }

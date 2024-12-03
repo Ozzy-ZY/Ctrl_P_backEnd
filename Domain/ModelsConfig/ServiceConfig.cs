@@ -12,6 +12,9 @@ namespace Domain.ModelsConfig
             builder.Property(x => x.Name).IsRequired().HasColumnType("nvarchar(50)");
             builder.Property(x => x.Description).IsRequired().HasColumnType("nvarchar(400)");
             builder.Property(x => x.ImageUrl).IsRequired();
+            builder.Property(ci => ci.RowVersion)
+                .IsRowVersion()
+                .HasConversion<byte[]>();
         }
     }
 }

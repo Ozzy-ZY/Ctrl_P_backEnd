@@ -14,6 +14,8 @@ namespace Infrastructure.DataAccess
         public IFrameRepository Frames { get; set; }
         public IMaterialRepository Materials { get; set; }
         public ISizeRepository Sizes { get; set; }
+        public OrderRepository Orders { get; set; }
+        public OrderItemRepository OrderItems { get; set; }
 
         public Task<int> CommitAsync();
         public Task<IDbTransaction> BeginTransactionAsync();
