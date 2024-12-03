@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace Application.DTOs.CategorizingModels
 {
-    public record CategoryDto(int Id, string Name);
+    public record FrameDto(int Id, string Name);
 }

@@ -10,27 +10,18 @@ namespace Application.DTOs.Mappers.CategorizingModels
 {
     public static class CategoryMapper
     {
-        public static CategoryDTO ToDTO(this Category category)
+        public static CategoryDto ToDTO(this Category category)
         {
-            return new CategoryDTO
-            {
-                Id = category.Id,
-                Name = category.Name
-            };
+            return new CategoryDto(category.Id, category.Name);
         }
 
-        public static Category ToCategory(this CategoryDTO categoryDto)
+        public static Category ToCategory(this CategoryDto categoryDto)
         {
             return new Category
             {
                 Id = categoryDto.Id,
                 Name = categoryDto.Name
             };
-        }
-
-        public static List<CategoryDTO> ToDTOList(this IEnumerable<Category> categories)
-        {
-            return categories.Select(c => c.ToDTO()).ToList();
         }
     }
 }

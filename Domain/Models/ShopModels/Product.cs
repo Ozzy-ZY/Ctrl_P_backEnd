@@ -14,7 +14,6 @@ namespace Domain.Models
         public DateTime UpdatedAt { get; set; }
         public decimal Price { get; set; }
         public decimal? OldPrice { get; set; }
-        public bool Sale { get; set; }
         public decimal Rating { get; set; }
         public virtual ICollection<ProductCategory> ProductCategories { get; set; }
         public virtual ICollection<ProductFrame> ProductFrames { get; set; }

@@ -21,8 +21,8 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        //[Authorize]
-        public async Task<IActionResult> CreateProduct([FromBody] ProductDTO productDto)
+        [Authorize]
+        public async Task<IActionResult> CreateProduct([FromForm] ProductDTO productDto)
         {
             ValidationResult result = await _validator.ValidateAsync(productDto);
             if (!result.IsValid)
@@ -39,8 +39,8 @@ namespace API.Controllers
         }
 
         [HttpPut("UpdateProduct")]
-        //[Authorize]
-        public async Task<IActionResult> UpdateProduct([FromBody] ProductDTO productDto)
+        [Authorize]
+        public async Task<IActionResult> UpdateProduct([FromForm] ProductDTO productDto)
         {
             ValidationResult result = await _validator.ValidateAsync(productDto);
             if (!result.IsValid)
@@ -53,7 +53,7 @@ namespace API.Controllers
 
         [HttpDelete("DeleteProduct")]
         [Authorize]
-        public async Task<IActionResult> DeleteProduct([FromBody] ProductDTO productDto)
+        public async Task<IActionResult> DeleteProduct([FromForm] ProductDTO productDto)
         {
             return Ok(await _productService.DeleteProductAsync(productDto));
         }

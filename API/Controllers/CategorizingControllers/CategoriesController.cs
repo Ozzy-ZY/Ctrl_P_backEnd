@@ -1,7 +1,5 @@
-﻿using Application.DTOs;
-using Application.DTOs.CategorizingModels;
+﻿using Application.DTOs.CategorizingModels;
 using Application.Services;
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,14 +18,14 @@ public class CategoryController : ControllerBase
 
     [HttpPost("add")]
     [Authorize]
-    public async Task<ActionResult<string>> AddCategory([FromBody] CategoryDTO categoryDto)
+    public async Task<ActionResult<string>> AddCategory([FromBody] CategoryDto categoryDto)
     {
         return (await _categoryService.CreateCategoryAsync(categoryDto)).ToString();
     }
 
     [HttpPut("update")]
     [Authorize]
-    public async Task<ActionResult<string>> UpdateCategory([FromBody] CategoryDTO categoryDto)
+    public async Task<ActionResult<string>> UpdateCategory([FromBody] CategoryDto categoryDto)
     {
         return (await _categoryService.UpdateCategoryAsync(categoryDto)).ToString();
     }
@@ -40,7 +38,7 @@ public class CategoryController : ControllerBase
 
     [HttpDelete("Delete")]
     [Authorize]
-    public async Task<IActionResult> DeleteCategory([FromBody] CategoryDTO categoryDto)
+    public async Task<IActionResult> DeleteCategory([FromBody] CategoryDto categoryDto)
     {
         return Ok(await _categoryService.DeleteCategoryAsync(categoryDto));
     }

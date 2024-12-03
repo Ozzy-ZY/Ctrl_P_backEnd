@@ -4,6 +4,7 @@ using Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241201210004_AddHashToProductPhotos")]
+    partial class AddHashToProductPhotos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -127,7 +130,7 @@ namespace Infrastructure.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "6c417673-496f-43ba-897a-ced22b86a8e0",
+                            ConcurrencyStamp = "5fa0b9dc-568f-4b4d-bc24-b68ba0950edd",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
@@ -189,12 +192,6 @@ namespace Infrastructure.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.HasKey("Id");
 
@@ -289,71 +286,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("Sizes", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Models.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("Domain.Models.OrderItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("OrderItem", (string)null);
-                });
-
             modelBuilder.Entity("Domain.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -397,15 +329,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("decimal(2,1)")
                         .HasDefaultValue(0m);
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<bool>("Sale")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -434,7 +357,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ProductId", "CategoryId")
                         .IsUnique();
 
-                    b.ToTable("ProductCategory");
+                    b.ToTable("ProductCategories");
                 });
 
             modelBuilder.Entity("Domain.Models.ProductModels.ProductFrame", b =>
@@ -452,7 +375,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ProductId", "FrameId")
                         .IsUnique();
 
-                    b.ToTable("ProductFrame");
+                    b.ToTable("ProductFrames");
                 });
 
             modelBuilder.Entity("Domain.Models.ProductModels.ProductMaterial", b =>
@@ -470,7 +393,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ProductId", "MaterialId")
                         .IsUnique();
 
-                    b.ToTable("ProductMaterial");
+                    b.ToTable("ProductMaterials");
                 });
 
             modelBuilder.Entity("Domain.Models.ProductModels.ProductPhoto", b =>
@@ -497,7 +420,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductPhoto");
+                    b.ToTable("ProductPhotos");
                 });
 
             modelBuilder.Entity("Domain.Models.ProductModels.ProductSize", b =>
@@ -515,7 +438,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ProductId", "SizeId")
                         .IsUnique();
 
-                    b.ToTable("ProductSize");
+                    b.ToTable("ProductSizes");
                 });
 
             modelBuilder.Entity("Domain.Models.Service", b =>
@@ -537,12 +460,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.HasKey("Id");
 
@@ -767,36 +684,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Domain.Models.Order", b =>
-                {
-                    b.HasOne("Domain.Models.AppUser", "AppUser")
-                        .WithMany("Orders")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AppUser");
-                });
-
-            modelBuilder.Entity("Domain.Models.OrderItem", b =>
-                {
-                    b.HasOne("Domain.Models.Order", "Order")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("Domain.Models.ProductModels.ProductCategory", b =>
                 {
                     b.HasOne("Domain.Models.CategorizingModels.Category", "Category")
@@ -941,8 +828,6 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("Cart")
                         .IsRequired();
-
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Domain.Models.Cart", b =>
@@ -968,11 +853,6 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Models.CategorizingModels.Size", b =>
                 {
                     b.Navigation("ProductSizes");
-                });
-
-            modelBuilder.Entity("Domain.Models.Order", b =>
-                {
-                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("Domain.Models.Product", b =>
