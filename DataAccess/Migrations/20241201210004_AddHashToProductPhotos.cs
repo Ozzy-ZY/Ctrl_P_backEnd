@@ -12,7 +12,7 @@ namespace Infrastructure.Migrations
         {
             migrationBuilder.AddColumn<string>(
                 name: "Hash",
-                table: "ProductPhotos",
+                table: "ProductPhoto",
                 type: "nvarchar(max)",
                 nullable: false,
                 defaultValue: "");
@@ -30,7 +30,7 @@ namespace Infrastructure.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "Hash",
-                table: "ProductPhotos");
+                table: "ProductPhoto");
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
