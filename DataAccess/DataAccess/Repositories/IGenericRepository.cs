@@ -23,7 +23,7 @@ namespace Infrastructure.DataAccess.Repositories
             params Expression<Func<T, object>>[] includeProperties);
 
         public Task AddAsync(T Entity);
-
+        public Task AddBulkAsync(IEnumerable<T> Entities);
         public Task UpdateAsync(T Entity);
 
         public Task DeleteAsync(T Entity);
