@@ -387,3 +387,5 @@ FodyWeavers.xsd
 /API/wwwroot/Services
 /API/wwwroot/Product
 /DataAccess/DataAccess/DbContextFactory.cs
+/API/wwwroot/Products
+

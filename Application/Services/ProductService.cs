@@ -39,7 +39,10 @@ namespace Application.Services
 
                     productPhotos.Add(new ProductPhoto
                     {
-                        Url = $"{uploadsFolder}/{uniqueFilename}".Replace(_environment.WebRootPath, "").Replace("\\", "/")
+
+                        Url = $"/Product/{uniqueFilename}",
+                        Hash = GetPhotoHash(image)
+
                     });
                 }
             }
@@ -229,6 +232,12 @@ namespace Application.Services
             {
                 string uniqueFilename = Guid.NewGuid().ToString() + Path.GetExtension(photo.FileName);
                 var filePath = Path.Combine(_environment.WebRootPath, "Product", uniqueFilename);
+
+                var directoryPath = Path.GetDirectoryName(filePath);
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
 
                 await using var fileStream = new FileStream(filePath, FileMode.Create);
                 await photo.CopyToAsync(fileStream);
