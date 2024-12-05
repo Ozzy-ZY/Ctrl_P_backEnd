@@ -23,9 +23,9 @@ public class CartService
     }
 
 
-    public async Task<AddToCartResult> AddToCartAsync(int userId, AddToCartDTO addToCartDTO)
+    public async Task<ServiceResult> AddToCartAsync(int userId, AddToCartDTO addToCartDTO)
     {
-        AddToCartResult result = new AddToCartResult();
+        ServiceResult result = new ServiceResult();
         var product = await _unitOfWork.Products.GetAsync(p => p.Id == addToCartDTO.ProductId);
         if (addToCartDTO.Quantity > product!.InStockAmount)
         {
@@ -43,7 +43,6 @@ public class CartService
         {
             existingCartItem = addToCartDTO.ToCartItem(cart!.Id);
             await _unitOfWork.CartItems.AddAsync(existingCartItem);
-            cart.TotalPrice += addToCartDTO.Quantity * product!.Price;
         }
         else
         {

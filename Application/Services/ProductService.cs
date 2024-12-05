@@ -33,14 +33,16 @@ namespace Application.Services
                 {
                     string uniqueFilename = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
                     var filePath = Path.Combine(uploadsFolder, uniqueFilename);
-                    
+
                     await using var fileStream = new FileStream(filePath, FileMode.Create);
                     await image.CopyToAsync(fileStream);
 
                     productPhotos.Add(new ProductPhoto
                     {
+
                         Url = $"/Product/{uniqueFilename}",
                         Hash = GetPhotoHash(image)
+
                     });
                 }
             }

@@ -17,6 +17,7 @@ namespace Application
             services.AddScoped<FrameService>();
             services.AddScoped<MaterialService>();
             services.AddScoped<SizeService>();
+            services.AddScoped<OrderingService>();
             services.AddValidatorsFromAssemblyContaining<ProductDtoValidator>();
             services.AddTransient<IAuthService, AuthService>();
 

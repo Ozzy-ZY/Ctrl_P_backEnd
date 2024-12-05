@@ -28,6 +28,13 @@ namespace Infrastructure.DataAccess.Repositories
             await dbSet.AddAsync(Entity);
         }
 
+        public async Task AddBulkAsync(IEnumerable<T> Entities)
+        {
+            _context.ChangeTracker.AutoDetectChangesEnabled = false;
+            await dbSet.AddRangeAsync(Entities);
+            _context.ChangeTracker.AutoDetectChangesEnabled = true;
+        }
+
         public Task DeleteAsync(T Entity)
         {
             dbSet.Remove(Entity);
