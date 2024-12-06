@@ -9,6 +9,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AllowAnonymous]
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -32,12 +33,16 @@ namespace API.Controllers
             return Ok(await _productService.CreateProductAsync(productDto));
         }
 
-        [HttpGet]
+        [HttpGet("GetAllProducts")]
         public async Task<IActionResult> GetAllProducts()
         {
             return Ok(await _productService.GetAllProductsAsync());
         }
-
+        [HttpGet("GetProduct/{Id}")]
+        public async Task<IActionResult> GetProduct(int Id)
+        {
+            return Ok(await _productService.GetProductAsync(Id));
+        }
         [HttpPut("UpdateProduct")]
         [Authorize]
         public async Task<IActionResult> UpdateProduct([FromForm] ProductDTO productDto)

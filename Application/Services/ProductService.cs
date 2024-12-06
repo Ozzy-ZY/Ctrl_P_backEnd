@@ -76,17 +76,29 @@ namespace Application.Services
         {
             var products = await _unitOfWork.Products.GetAllAsync(
                  null,
-                 q => q.Include(p => p.ProductCategories)
-                       .ThenInclude(pc => pc.Category),
+                 q => q.Include(p => p.ProductPhotos.OrderBy(photo => photo.Id).Take(1)),
                  q => q.Include(p => p.ProductFrames)
-                       .ThenInclude(pc => pc.Frame),
-                 q => q.Include(p => p.ProductMaterials)
-                 .ThenInclude(pc => pc.Material),
-                 q => q.Include(p => p.ProductSizes)
-                 .ThenInclude(pc => pc.Size),
-                 q => q.Include(p => p.ProductPhotos)
+                       .ThenInclude(pc => pc.Frame)
             );
             return products.Select(p => p.ProductAsDto()).ToList();
+        }
+        public async Task<ProductDTO> GetProductAsync(int Id)
+        {
+            var product = await _unitOfWork.Products.GetAsync(
+                p => p.Id == Id,
+                includeProperties: query => query
+                    .Include(p => p.ProductCategories)
+                    .ThenInclude(pc => pc.Category)
+                    .Include(p => p.ProductFrames)
+                    .ThenInclude(pf => pf.Frame)
+                    .Include(p => p.ProductMaterials)
+                    .ThenInclude(pm => pm.Material)
+                    .Include(p => p.ProductSizes)
+                    .ThenInclude(ps => ps.Size)
+                    .Include(p => p.ProductPhotos)
+            );
+
+            return product.ProductAsDto();
         }
 
         public async Task<int> UpdateProductAsync(ProductDTO dto)
