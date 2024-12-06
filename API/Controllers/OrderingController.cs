@@ -36,4 +36,17 @@ public class OrderingController: ControllerBase
         var result = await _orderingService.ViewPastOrders(userId);
         return Ok(result);
     }
+    [HttpGet("Get-Every-Order-Paginated/{pageIndex:int}/{pageSize:int}")]
+    [Authorize]
+    public async Task<IActionResult> GetEveryOrder(int pageIndex, int pageSize)
+    {
+        var result = await _orderingService.GetAllOrders(pageIndex, pageSize);
+        return Ok(result);
+    }
+    [HttpGet("Get-Every-Order")]
+    public async Task<IActionResult> GetEveryOrder()
+    {
+        var result = await _orderingService.GetAllOrders();
+        return Ok(result);
+    }
 }
