@@ -35,9 +35,9 @@ namespace API.Controllers
             var result = await _authService.RegistrationAsync(model, "Admin");
             if (result.Success)
             {
-                return Ok(result.Message);
+                return Ok(result);
             }
-            return BadRequest(result.Message);
+            return BadRequest(result);
         }
 
         [HttpPost("RegisterUser")]
@@ -52,9 +52,9 @@ namespace API.Controllers
             var result = await _authService.RegistrationAsync(model, "User");
             if (result.Success)
             {
-                return Ok(result.Message);
+                return Ok(result);
             }
-            return BadRequest(result.Message);
+            return BadRequest(result);
         }
 
         [HttpPost("Login")]
