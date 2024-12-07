@@ -14,6 +14,7 @@ namespace Infrastructure.DataAccess
         public IFrameRepository Frames { get; set; }
         public IMaterialRepository Materials { get; set; }
         public ISizeRepository Sizes { get; set; }
+        public IProductReviewsRepository ProductReviews { get; set; }
         public OrderRepository Orders { get; set; }
         public OrderItemRepository OrderItems { get; set; }
 
