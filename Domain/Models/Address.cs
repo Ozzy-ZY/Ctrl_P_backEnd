@@ -12,9 +12,16 @@ namespace Domain.Models
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        public string AddressString { get; set; }
-        public string StreetName { get; set; }
-        public int BuildingNumber { get; set; }
+        public string AddressText { get; set; }
+        public string BillingAddress { get; set; }
+        public string FullName { get; set; }
+        public string? CompanyName { get; set; }
+        public string Country { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public string ZipCode { get; set; }
+        public string Phone { get; set; }
+        public string StreetAddress {get; set;}
         public virtual AppUser User { get; set; }
 
     }

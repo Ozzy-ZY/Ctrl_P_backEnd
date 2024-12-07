@@ -12,7 +12,7 @@ public class OrderConfig: IEntityTypeConfiguration<Order>
             .HasOne(o => o.AppUser)
             .WithMany(u => u.Orders)
             .HasForeignKey(o => o.UserId);
-        
+        builder.HasOne(o => o.Address);
         builder.Property(ci => ci.RowVersion)
             .IsRowVersion()
             .HasConversion<byte[]>();

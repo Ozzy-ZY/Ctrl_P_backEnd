@@ -29,7 +29,6 @@ public class OrderingService
             result.Errors.Add("Cart is Empty!");
             return result;
         }
-
         var order = new Order()
         {
             OrderDate = DateTime.Now,

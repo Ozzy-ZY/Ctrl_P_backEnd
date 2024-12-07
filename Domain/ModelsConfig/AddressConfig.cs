@@ -8,7 +8,8 @@ namespace Domain.ModelsConfig
     {
         public void Configure(EntityTypeBuilder<Address> builder)
         {
-            
+            builder.Property(a => a.CompanyName)
+                .IsRequired(false);
         }
     }
 }
