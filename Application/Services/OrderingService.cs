@@ -62,12 +62,27 @@ public class OrderingService
 
     public async Task<IEnumerable<Order>> ViewPastOrders(int userId)
     {
-        var result = new ServiceResult()
-        {
-            Success = false
-        };
         var orders = (await _unitOfWork.Orders
             .GetAllAsync(o => o.UserId == userId, o => o.OrderItems));
         return orders;
     }
+
+    public async Task<IEnumerable<Order>?> GetAllOrders(int pageIndex, int pageSize)
+    {
+        var orders = new List<Order>();
+        orders = (await _unitOfWork.Orders.GetPaginatedAsync(pageIndex, pageSize))?.Items;
+        return orders;
+    }
+    public async Task<IEnumerable<Order>?> GetAllOrders()
+    {
+        var orders = await _unitOfWork.Orders.GetAllAsync();
+        return orders;
+    }
+
+    public async Task<Order?> GetOrderDetailsById(int? orderId)
+    {
+        var order = await _unitOfWork.Orders.GetAsync(o=> o.Id == orderId, o => o.OrderItems);
+        return order;
+    }
+    
 }
