@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Domain.Models.ProductModels;
+using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Models
 {
@@ -11,7 +12,8 @@ namespace Domain.Models
 
         public virtual Cart Cart { get; set; }
         public virtual ICollection<Order> Orders { get; set; }
-        
+        public virtual ICollection<ProductReviews> Reviews { get; set; }
+
 
     }
 }
