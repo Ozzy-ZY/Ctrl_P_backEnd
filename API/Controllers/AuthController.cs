@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.AuthModels;
 using Application.Services;
+using Domain.StaticData;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,7 @@ namespace API.Controllers
         }
 
         [HttpPost("RegisterAdmin")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = StaticData.AdminRole)]
         public async Task<IActionResult> RegisterAdmin(AppUserRegisterationDto model)
         {
             var modelState = await _validatorRegister.ValidateAsync(model);
@@ -79,7 +80,6 @@ namespace API.Controllers
         }
 
         [HttpPost("RefreshToken")]
-        [Authorize]
         public async Task<IActionResult> RefreshToken(RequestTokenModel model)
         {
             model.RefreshToken = Uri.UnescapeDataString(model.RefreshToken);
@@ -98,7 +98,7 @@ namespace API.Controllers
         }
 
         [HttpPut("RevokeToken")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = StaticData.AdminRole)]
         public async Task<IActionResult> RevokeToken(RequestTokenModel model)
         {
             model.RefreshToken = Uri.UnescapeDataString(model.RefreshToken);

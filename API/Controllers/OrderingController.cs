@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Application.Services;
+using Domain.StaticData;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,15 +28,7 @@ public class OrderingController: ControllerBase
         }
         return BadRequest(result);
     }
-
-    [HttpGet("get-orders")]
-    [Authorize]
-    public async Task<IActionResult> GetOrders()
-    {
-        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-        var result = await _orderingService.ViewPastOrders(userId);
-        return Ok(result);
-    }
+    
     [HttpGet("Get-Every-Order-Paginated/{pageIndex:int}/{pageSize:int}")]
     [Authorize]
     public async Task<IActionResult> GetEveryOrder(int pageIndex, int pageSize)
@@ -51,10 +44,23 @@ public class OrderingController: ControllerBase
     }
 
     [HttpGet("Get-Past-Orders")]
+    [Authorize]
     public async Task<IActionResult> GetPastOrders()
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
         var result = await _orderingService.ViewPastOrders(userId);
         return Ok(result);
+    }
+
+    [HttpPut("Update-OrderStatus{orderId:int}")]
+    [Authorize(Roles = StaticData.AdminRole)]
+    public async Task<IActionResult> UpdateOrderStatus(int orderId, string orderStatus)
+    {
+        var result = await _orderingService.ChangeOrderStatus(orderId, orderStatus);
+        if (result.Success)
+        {
+            return Ok(result);
+        }
+        return BadRequest(result);
     }
 }
