@@ -5,7 +5,7 @@
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class addedPaymnetMehodandaddresstotheorder : Migration
+    public partial class Editedtherelationsbetweentheaddressandtheordertomakeitdependantontheuserandnotaforeignkey : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,12 +24,12 @@ namespace Infrastructure.Migrations
                 table: "Addresses",
                 newName: "StreetAddress");
 
-            migrationBuilder.AddColumn<int>(
-                name: "AddressId",
+            migrationBuilder.AddColumn<string>(
+                name: "AddressText",
                 table: "Orders",
-                type: "int",
+                type: "nvarchar(max)",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: "");
 
             migrationBuilder.AddColumn<string>(
                 name: "OrderStatus",
@@ -100,50 +100,19 @@ namespace Infrastructure.Migrations
                 nullable: false,
                 defaultValue: "");
 
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { 1, null, "Admin", "ADMIN" });
-
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: 1,
                 column: "ConcurrencyStamp",
-                value: "ef26a487-78fc-46a2-8cc7-679c9baba6d8");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orders_AddressId",
-                table: "Orders",
-                column: "AddressId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Orders_Addresses_AddressId",
-                table: "Orders",
-                column: "AddressId",
-                principalTable: "Addresses",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                value: "681ea6de-0381-42eb-950d-2aa9f30e7538");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Orders_Addresses_AddressId",
-                table: "Orders");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Orders_AddressId",
-                table: "Orders");
-
-            migrationBuilder.DeleteData(
-                table: "AspNetRoles",
-                keyColumn: "Id",
-                keyValue: 1);
-
             migrationBuilder.DropColumn(
-                name: "AddressId",
+                name: "AddressText",
                 table: "Orders");
 
             migrationBuilder.DropColumn(

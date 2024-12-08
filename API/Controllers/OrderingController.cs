@@ -49,4 +49,12 @@ public class OrderingController: ControllerBase
         var result = await _orderingService.GetAllOrders();
         return Ok(result);
     }
+
+    [HttpGet("Get-Past-Orders")]
+    public async Task<IActionResult> GetPastOrders()
+    {
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+        var result = await _orderingService.ViewPastOrders(userId);
+        return Ok(result);
+    }
 }

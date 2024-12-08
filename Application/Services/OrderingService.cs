@@ -37,7 +37,7 @@ public class OrderingService
             OrderDate = DateTime.Now,
             TotalPrice = cartDto.TotalPrice,
             UserId = cartDto.UserId,
-            AddressId = userAddress?.Id ?? 0,
+            AddressText = userAddress!.AddressText,
             PaymentMethod = paymentMethod
         };
         await _unitOfWork.Orders.AddAsync(order);
