@@ -2,6 +2,7 @@
 using Application.DTOs;
 using Application.DTOs.Mappers;
 using Domain.Models;
+using Domain.StaticData;
 using Infrastructure.DataAccess;
 
 namespace Application.Services;
@@ -16,25 +17,29 @@ public class OrderingService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<ServiceResult> CreateOrderFromCart(int userId)
+    public async Task<ServiceResult> CreateOrderFromCart(int userId, string paymentMethod = StaticData.CashPayment)
     {
         var result = new ServiceResult()
         {
             Success = false
         };
-        var cartDto = ((await _unitOfWork.Carts.GetCartWithItemsAsync(userId))!).ToCartDTO();
-        var cartItems = (await _cartService.GetCartWithItemsAsync(cartDto.UserId)).CartItems.ToList();
+        var main = await _unitOfWork.Carts.GetCartWithItemsAsync(userId);
+        var cartDto = main!.ToCartDTO();
+        var cartItems = main!.CartItems.ToList();
         if (cartItems.Count == 0)
         {
             result.Errors.Add("Cart is Empty!");
             return result;
         }
-
+        var userAddress = await _unitOfWork.Addresses.GetAsync(a=> a.UserId == userId);
         var order = new Order()
         {
             OrderDate = DateTime.Now,
             TotalPrice = cartDto.TotalPrice,
             UserId = cartDto.UserId,
+            AddressText = userAddress!.AddressText,
+            PaymentMethod = paymentMethod,
+            OrderStatus = "Created"
         };
         await _unitOfWork.Orders.AddAsync(order);
         await _unitOfWork.CommitAsync();

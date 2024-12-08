@@ -12,7 +12,6 @@ public class OrderConfig: IEntityTypeConfiguration<Order>
             .HasOne(o => o.AppUser)
             .WithMany(u => u.Orders)
             .HasForeignKey(o => o.UserId);
-        
         builder.Property(ci => ci.RowVersion)
             .IsRowVersion()
             .HasConversion<byte[]>();

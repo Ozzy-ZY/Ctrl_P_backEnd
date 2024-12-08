@@ -22,6 +22,7 @@ namespace Infrastructure.DataAccess
         public IProductReviewsRepository ProductReviews { get; set; }
         public OrderRepository Orders { get; set; }
         public OrderItemRepository OrderItems { get; set; }
+        public AddressRepository Addresses { get; set; }
         public ICartItemRepository CartItems { get; set; }
 
         public UnitOfWork(AppDbContext context,
@@ -42,6 +43,7 @@ namespace Infrastructure.DataAccess
             ProductReviews = new ProductReviewsRepository(context);
             Orders = new OrderRepository(context);
             OrderItems = new OrderItemRepository(context);
+            Addresses = new AddressRepository(context);
         }
 
         public async Task<int> CommitAsync()
