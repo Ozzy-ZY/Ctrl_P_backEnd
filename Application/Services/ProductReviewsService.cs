@@ -44,7 +44,7 @@ namespace Application.Services
         public async Task<int> DeleteProductReviewAsync(ProductReviewsDto productReviewDto)
         {
             // Fetch the existing review from the database
-            var existingReview = await _unitOfWork.ProductReviews.GetAsync(p=>p.Id==productReviewDto.Id);
+            var existingReview = await _unitOfWork.ProductReviews.GetAsync(p=>p.Id ==productReviewDto.Id);
 
             // Check if the reviewer IDs match
             if (existingReview.ReviewerId != productReviewDto.ReviewerId)

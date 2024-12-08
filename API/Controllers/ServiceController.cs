@@ -21,16 +21,16 @@ public class ServiceController : ControllerBase
 
     [HttpPost("add")]
     [Authorize]
-    public async Task<ActionResult<string>> AddService([FromForm] ServiceDTO service)
+    public async Task<IActionResult> AddService([FromForm] ServiceDTO service)
     {
-        return (await _serviceService.AddService(service)).ToString();
+        return Ok(await _serviceService.AddService(service));
     }
 
     [HttpPut("update")]
     [Authorize]
-    public async Task<ActionResult<string>> UpdateService([FromForm] ServiceDTO service)
+    public async Task<IActionResult> UpdateService([FromForm] ServiceDTO service)
     {
-        return (await _serviceService.UpdateServiceAsync(service)).ToString();
+        return Ok(await _serviceService.UpdateServiceAsync(service));
     }
 
     [HttpGet("Get-All")]

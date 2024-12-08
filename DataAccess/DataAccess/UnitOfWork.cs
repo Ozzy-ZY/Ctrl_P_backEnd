@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Data;
 using Microsoft.EntityFrameworkCore.Storage;
 using Infrastructure.DataAccess.Repositories.CategorizingModels;
+using Domain.Models.ShopModels;
 
 namespace Infrastructure.DataAccess
 {
@@ -20,6 +21,7 @@ namespace Infrastructure.DataAccess
         public IMaterialRepository Materials { get; set; }
         public ISizeRepository Sizes { get; set; }
         public IProductReviewsRepository ProductReviews { get; set; }
+        public IWishlistRepository Wishlists { get; set; }
         public OrderRepository Orders { get; set; }
         public OrderItemRepository OrderItems { get; set; }
         public AddressRepository Addresses { get; set; }
@@ -41,6 +43,7 @@ namespace Infrastructure.DataAccess
             Materials = new MaterialRepository(context);
             Sizes = new SizeRepository(context);
             ProductReviews = new ProductReviewsRepository(context);
+            Wishlists = new WishlistRepository(context);
             Orders = new OrderRepository(context);
             OrderItems = new OrderItemRepository(context);
             Addresses = new AddressRepository(context);

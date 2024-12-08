@@ -2,6 +2,7 @@
 using Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -19,15 +20,15 @@ namespace API.Controllers
         }
         [HttpPost("add")]
         [Authorize]
-        public async Task<ActionResult<string>> AddReview([FromBody] ProductReviewsDto review)
+        public async Task<IActionResult> AddReview([FromBody] ProductReviewsDto review)
         {
-            return (await _productReviewService.CreateProductReviewAsync(review)).ToString();
+            return Ok(await _productReviewService.CreateProductReviewAsync(review));
         }
         [HttpPut("update")]
         [Authorize]
-        public async Task<ActionResult<string>> UpdateReview([FromBody] ProductReviewsDto review)
+        public async Task<IActionResult> UpdateReview([FromBody] ProductReviewsDto review)
         {
-            return (await _productReviewService.UpdateProductReviewAsync(review)).ToString();
+            return Ok(await _productReviewService.UpdateProductReviewAsync(review));
         }
         [HttpDelete("Delete")]
         [Authorize]
