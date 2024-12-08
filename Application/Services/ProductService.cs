@@ -23,32 +23,7 @@ namespace Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        private async Task<List<ProductPhoto>> SaveProductImagesAsync(IEnumerable<IFormFile> images, string uploadsFolder)
-        {
-            var productPhotos = new List<ProductPhoto>();
-
-            if (images != null && images.Any())
-            {
-                foreach (var image in images)
-                {
-                    string uniqueFilename = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
-                    var filePath = Path.Combine(uploadsFolder, uniqueFilename);
-
-                    await using var fileStream = new FileStream(filePath, FileMode.Create);
-                    await image.CopyToAsync(fileStream);
-
-                    productPhotos.Add(new ProductPhoto
-                    {
-
-                        Url = $"/Product/{uniqueFilename}",
-                        Hash = GetPhotoHash(image)
-
-                    });
-                }
-            }
-
-            return productPhotos;
-        }
+        
 
         public async Task<int> CreateProductAsync(ProductDTO dto)
         {
@@ -62,10 +37,10 @@ namespace Application.Services
             // Create the product object and set its properties
             Product product = dto.DtoAsProductCreate(uploadsFolder); // Adjust if needed
             product.ProductPhotos = productPhotos;
-            product.ProductCategories = dto.ProductCategories?.Select(id => new ProductCategory { CategoryId = id }).ToList() ?? new List<ProductCategory>();
-            product.ProductFrames = dto.ProductFrames?.Select(id => new ProductFrame { FrameId = id }).ToList() ?? new List<ProductFrame>();
-            product.ProductMaterials = dto.ProductMaterials?.Select(id => new ProductMaterial { MaterialId = id }).ToList() ?? new List<ProductMaterial>();
-            product.ProductSizes = dto.ProductSizes?.Select(id => new ProductSize { SizeId = id }).ToList() ?? new List<ProductSize>();
+            product.ProductCategories = dto.ProductCategoryIds?.Select(id => new ProductCategory { CategoryId = id }).ToList() ?? new List<ProductCategory>();
+            product.ProductFrames = dto.ProductFrameIds?.Select(id => new ProductFrame { FrameId = id }).ToList() ?? new List<ProductFrame>();
+            product.ProductMaterials = dto.ProductMaterialIds?.Select(id => new ProductMaterial { MaterialId = id }).ToList() ?? new List<ProductMaterial>();
+            product.ProductSizes = dto.ProductSizeIds?.Select(id => new ProductSize { SizeId = id }).ToList() ?? new List<ProductSize>();
 
             // Add the product to the database
             await _unitOfWork.Products.AddAsync(product);
@@ -96,6 +71,7 @@ namespace Application.Services
                     .Include(p => p.ProductSizes)
                     .ThenInclude(ps => ps.Size)
                     .Include(p => p.ProductPhotos)
+                    .Include(p => p.ProductReviews)
             );
 
             return product.ProductAsDto();
@@ -128,10 +104,10 @@ namespace Application.Services
             var currentPhotos = product.ProductPhotos.ToDictionary(pp => pp.Hash, pp => pp);
 
             // Handle null for dto.ProductCategories
-            var newCategories = dto.ProductCategories ?? new List<int>();
-            var newFrames = dto.ProductFrames ?? new List<int>();
-            var newMaterials = dto.ProductMaterials ?? new List<int>();
-            var newSizes = dto.ProductSizes ?? new List<int>();
+            var newCategories = dto.ProductCategoryIds ?? new List<int>();
+            var newFrames = dto.ProductFrameIds ?? new List<int>();
+            var newMaterials = dto.ProductMaterialIds ?? new List<int>();
+            var newSizes = dto.ProductSizeIds ?? new List<int>();
             var newPhotos = dto.Image?.Select(i => (i, GetPhotoHash(i))).ToList() ?? new List<(IFormFile, string)>();
 
             // Find categories to add and remove
@@ -266,15 +242,6 @@ namespace Application.Services
             return await _unitOfWork.CommitAsync();
         }
 
-        // Helper method to get the hash of a photo
-        private string GetPhotoHash(IFormFile photo)
-        {
-            using var md5 = MD5.Create();
-            using var stream = photo.OpenReadStream();
-            var hash = md5.ComputeHash(stream);
-            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-        }
-
         public async Task<int> DeleteProductAsync(ProductDTO dto)
         {
             // Fetch the product to be deleted
@@ -333,6 +300,40 @@ namespace Application.Services
 
             // Save changes
             return await _unitOfWork.CommitAsync();
+        }
+        // Helper method to get the hash of a photo
+        private string GetPhotoHash(IFormFile photo)
+        {
+            using var md5 = MD5.Create();
+            using var stream = photo.OpenReadStream();
+            var hash = md5.ComputeHash(stream);
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+        }
+        private async Task<List<ProductPhoto>> SaveProductImagesAsync(IEnumerable<IFormFile> images, string uploadsFolder)
+        {
+            var productPhotos = new List<ProductPhoto>();
+
+            if (images != null && images.Any())
+            {
+                foreach (var image in images)
+                {
+                    string uniqueFilename = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                    var filePath = Path.Combine(uploadsFolder, uniqueFilename);
+
+                    await using var fileStream = new FileStream(filePath, FileMode.Create);
+                    await image.CopyToAsync(fileStream);
+
+                    productPhotos.Add(new ProductPhoto
+                    {
+
+                        Url = $"/Product/{uniqueFilename}",
+                        Hash = GetPhotoHash(image)
+
+                    });
+                }
+            }
+
+            return productPhotos;
         }
     }
 }

@@ -10,11 +10,9 @@ namespace Application.Services;
 public class CategoryService
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IWebHostEnvironment _environment;
 
-    public CategoryService(IUnitOfWork unitOfWork, IWebHostEnvironment environment)
+    public CategoryService(IUnitOfWork unitOfWork)
     {
-        _environment = environment;
         _unitOfWork = unitOfWork;
     }
 

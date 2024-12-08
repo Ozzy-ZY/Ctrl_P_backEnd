@@ -19,7 +19,8 @@ namespace Domain.Models
         public virtual ICollection<ProductFrame> ProductFrames { get; set; }
         public virtual ICollection<ProductMaterial> ProductMaterials { get; set; }
         public virtual ICollection<ProductSize> ProductSizes { get; set; }
-        public virtual ICollection<ProductPhoto> ProductPhotos { get; set; } // Collection of photos
+        public virtual ICollection<ProductPhoto> ProductPhotos { get; set; }
+        public virtual ICollection<ProductReviews> ProductReviews { get; set; }
         public virtual ICollection<CartItem> CartItems { get; set; }
 
     }

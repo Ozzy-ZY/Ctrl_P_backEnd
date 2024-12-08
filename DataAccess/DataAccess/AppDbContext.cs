@@ -19,6 +19,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ProductMaterial> ProductMaterials { get; set; }
         public DbSet<ProductSize> ProductSizes { get; set; }
         public DbSet<ProductPhoto> ProductPhotos { get; set; }
+        public DbSet<ProductReviews> ProductReviews { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<AppUser> User { get; set; }

@@ -36,15 +36,17 @@ namespace Domain.ModelsConfig
                 .WithOne(i => i.Product)
                 .HasForeignKey(i => i.ProductId);
 
-            // Configure check constraints using ToTable
-            builder.ToTable(t =>
-            {
-                t.HasCheckConstraint("CK_Product_Price_NonNegative", "[Price] >= 0");
-                t.HasCheckConstraint("CK_Product_OldPrice_GreaterThanPrice", "[OldPrice] IS NULL OR [OldPrice] > [Price]");
-            });
+            
             builder.Property(p => p.RowVersion)
                 .IsRowVersion()
                 .HasConversion<byte[]>();
+            
+            // Configure check constraints Product Details
+                        builder.ToTable(t =>
+                        {
+                            t.HasCheckConstraint("CK_Product_Price_NonNegative", "[Price] >= 0");
+                            t.HasCheckConstraint("CK_Product_OldPrice_GreaterThanPrice", "[OldPrice] IS NULL OR [OldPrice] > [Price]");
+                        });
         }
     }
 

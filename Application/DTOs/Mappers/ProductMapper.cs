@@ -21,19 +21,19 @@ namespace Application.DTOs.Mappers
                 OldPrice = dto.OldPrice,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
-                ProductCategories = dto.ProductCategories?.Select(id => new ProductCategory
+                ProductCategories = dto.ProductCategoryIds?.Select(id => new ProductCategory
                 {
                     CategoryId = id
                 }).ToList() ?? new List<ProductCategory>(),
-                ProductFrames = dto.ProductFrames?.Select(id => new ProductFrame
+                ProductFrames = dto.ProductFrameIds?.Select(id => new ProductFrame
                 {
                     FrameId = id
                 }).ToList() ?? new List<ProductFrame>(),
-                ProductMaterials = dto.ProductMaterials?.Select(id => new ProductMaterial
+                ProductMaterials = dto.ProductMaterialIds?.Select(id => new ProductMaterial
                 {
                     MaterialId = id
                 }).ToList() ?? new List<ProductMaterial>(),
-                ProductSizes = dto.ProductSizes?.Select(id => new ProductSize
+                ProductSizes = dto.ProductSizeIds?.Select(id => new ProductSize
                 {
                     SizeId = id
                 }).ToList() ?? new List<ProductSize>(),
@@ -53,23 +53,24 @@ namespace Application.DTOs.Mappers
                 Price = dto.Price,
                 OldPrice = dto.OldPrice,
                 UpdatedAt = DateTime.Now,
-                ProductCategories = (dto.ProductCategories ?? Enumerable.Empty<int>()).Select(id => new ProductCategory
+                ProductCategories = (dto.ProductCategoryIds ?? Enumerable.Empty<int>()).Select(id => new ProductCategory
                 {
                     CategoryId = id
                 }).ToList(),
-                ProductFrames = (dto.ProductFrames ?? Enumerable.Empty<int>()).Select(id => new ProductFrame
+                ProductFrames = (dto.ProductFrameIds ?? Enumerable.Empty<int>()).Select(id => new ProductFrame
                 {
                     FrameId = id
                 }).ToList(),
-                ProductMaterials = (dto.ProductMaterials ?? Enumerable.Empty<int>()).Select(id => new ProductMaterial
+                ProductMaterials = (dto.ProductMaterialIds ?? Enumerable.Empty<int>()).Select(id => new ProductMaterial
                 {
                     MaterialId = id
                 }).ToList(),
-                ProductSizes = (dto.ProductSizes ?? Enumerable.Empty<int>()).Select(id => new ProductSize
+                ProductSizes = (dto.ProductSizeIds ?? Enumerable.Empty<int>()).Select(id => new ProductSize
                 {
                     SizeId = id
                 }).ToList(),
-                ProductPhotos = new List<ProductPhoto> { new ProductPhoto { Url = url } }
+                ProductPhotos = new List<ProductPhoto> { new ProductPhoto { Url = url } },
+
             };
         }
 
@@ -82,7 +83,7 @@ namespace Application.DTOs.Mappers
                 UnitsInStock: product.InStockAmount,
                 Price: product.Price,
                 OldPrice: product.OldPrice,
-                ProductCategories: product.ProductCategories?
+                ProductCategoryIds: product.ProductCategories?
                     .Where(pc => pc.CategoryId != 0)
                     .Select(pc => pc.CategoryId)
                     .ToList(),
@@ -91,7 +92,7 @@ namespace Application.DTOs.Mappers
                     .Where(name => !string.IsNullOrEmpty(name))
                     .Cast<string>()
                     .ToList(),
-                ProductFrames: product.ProductFrames?
+                ProductFrameIds: product.ProductFrames?
                     .Where(pf => pf.FrameId != 0)
                     .Select(pf => pf.FrameId)
                     .ToList(),
@@ -100,7 +101,7 @@ namespace Application.DTOs.Mappers
                     .Where(name => !string.IsNullOrEmpty(name))
                     .Cast<string>()
                     .ToList(),
-                ProductMaterials: product.ProductMaterials?
+                ProductMaterialIds: product.ProductMaterials?
                     .Where(pm => pm.MaterialId != 0)
                     .Select(pm => pm.MaterialId)
                     .ToList(),
@@ -109,7 +110,7 @@ namespace Application.DTOs.Mappers
                     .Where(name => !string.IsNullOrEmpty(name))
                     .Cast<string>()
                     .ToList(),
-                ProductSizes: product.ProductSizes?
+                ProductSizeIds: product.ProductSizes?
                     .Where(ps => ps.SizeId != 0)
                     .Select(ps => ps.SizeId)
                     .ToList(),
@@ -121,7 +122,19 @@ namespace Application.DTOs.Mappers
                 Url: product.ProductPhotos?
                     .Select(pp => pp.Url)
                     .ToList(),
-                Image: null! // Assuming images are not stored in the Product entity
+                Image: null! ,
+                Review: product.ProductReviews?
+                    .Select(pr => pr.Review)
+                    .ToList(),
+                Rating: product.ProductReviews ?
+                .Select(pr => pr.Rating)
+                    .ToList(),
+                ReviewerName: product.ProductReviews ?
+                .Select(pr => pr.Name)
+                    .ToList(),
+                ReviewDate: product.ProductReviews ?
+                .Select(pr => pr.ReviewDate)
+                    .ToList()
 
             );
         }
