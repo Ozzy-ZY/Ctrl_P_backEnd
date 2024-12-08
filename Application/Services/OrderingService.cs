@@ -38,7 +38,8 @@ public class OrderingService
             TotalPrice = cartDto.TotalPrice,
             UserId = cartDto.UserId,
             AddressText = userAddress!.AddressText,
-            PaymentMethod = paymentMethod
+            PaymentMethod = paymentMethod,
+            OrderStatus = "Created"
         };
         await _unitOfWork.Orders.AddAsync(order);
         await _unitOfWork.CommitAsync();
