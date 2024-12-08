@@ -22,7 +22,8 @@ namespace Domain.Models
         public string State { get; set; }
         public string ZipCode { get; set; }
         public string Phone { get; set; }
-        public string StreetAddress {get; set;}
+        public string StreetAddress { get; set; }
+        public string Note { get; set; }
         [JsonIgnore]
         public virtual AppUser User { get; set; }
 

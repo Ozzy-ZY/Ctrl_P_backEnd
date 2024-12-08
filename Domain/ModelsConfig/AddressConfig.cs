@@ -10,6 +10,7 @@ namespace Domain.ModelsConfig
         {
             builder.Property(a => a.CompanyName)
                 .IsRequired(false);
+            builder.Property(a => a.Note).IsRequired(false);
         }
     }
 }
