@@ -24,7 +24,8 @@ namespace Application.DTOs.Mappers;
                 wishlist.Product.InStockAmount,
                 wishlist.Product.ProductFrames.Select(pf => pf.FrameId).ToList(),
                 wishlist.Product.ProductFrames.Select(pf => pf.Frame.Name).ToList(),
-                wishlist.Product.ProductPhotos.OrderBy(photo => photo.Id).Take(1).Select(photo => photo.Url).ToList()
+                wishlist.Product.ProductPhotos.OrderBy(photo => photo.Id).Take(1).Select(photo => photo.Url).ToList(),
+                IsInWishlist: false
             );
     }
 }

@@ -16,6 +16,7 @@ namespace Application.DTOs
         int? UnitsInStock,
         List<int>? ProductFrameIds,
         List<string>? FramesNames,
-        List<string>? Url
+        List<string>? Url,
+        bool? IsInWishlist
     );
 }

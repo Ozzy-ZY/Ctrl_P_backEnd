@@ -15,22 +15,40 @@ public class WishlistService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<int> AddToWishlistAsync(WishlistDto wishlistDto)
+    public async Task<ServiceResult> AddToWishlistAsync(WishlistDto wishlistDto)
     {
+        ServiceResult result = new ServiceResult();
         var wishlist = wishlistDto.ToWishlist();
         await _unitOfWork.Wishlists.AddAsync(wishlist);
-        return await _unitOfWork.CommitAsync();
+        if (await _unitOfWork.CommitAsync() > 0)
+        {
+            result.Success = true;
+            return result;
+        }
+
+        result.Errors.Add("Couldn't add the product to Your Wishlist");
+        result.Success = false;
+        return result;
     }
 
-    public async Task<int> RemoveFromWishlistAsync(WishlistDto wishlistDto)
+    public async Task<ServiceResult> RemoveFromWishlistAsync(WishlistDto wishlistDto)
     {
+        ServiceResult result = new ServiceResult();
         await _unitOfWork.Wishlists.DeleteAsync(wishlistDto.ToWishlist());
-        return await _unitOfWork.CommitAsync();
+        if (await _unitOfWork.CommitAsync() > 0)
+        {
+            result.Success = true;
+            return result;
+        }
+
+        result.Errors.Add("Couldn't add the product to Your Wishlist");
+        result.Success = false;
+        return result;
     }
 
     public async Task<List<WishlistDto>> GetAllWishlistAsync(int userId)
     {
-        var wishlist = await _unitOfWork.Wishlists.GetAllAsync(
+        var wishlists = await _unitOfWork.Wishlists.GetAllAsync(
             w => w.UserId == userId,
             q => q.Include(w => w.Product)
                   .ThenInclude(p => p.ProductPhotos.OrderBy(photo => photo.Id).Take(1))
@@ -38,7 +56,20 @@ public class WishlistService
                   .ThenInclude(pf => pf.Frame)
         );
 
-        return wishlist.Select(w => w.ToDTO()).ToList();
+        var wishlistDtos = wishlists.Select(p =>
+        {
+            var wishlistDto = p.ToDTO();
+            wishlistDto = wishlistDto with { IsInWishlist = IsProductInWishlistAsync(userId, wishlistDto.ProductId).Result };
+            return wishlistDto;
+        }).ToList();
+
+        return wishlistDtos;
     }
 
+    public async Task<bool> IsProductInWishlistAsync(int userId, int productId)
+    {
+        var wishlistItem = await _unitOfWork.Wishlists.GetAllAsync(w => w.UserId == userId && w.ProductId == productId);
+
+        return wishlistItem.Any();
+    }
 }
