@@ -69,8 +69,7 @@ namespace Application.DTOs.Mappers
                 {
                     SizeId = id
                 }).ToList(),
-                ProductPhotos = new List<ProductPhoto> { new ProductPhoto { Url = url } },
-
+                ProductPhotos = new List<ProductPhoto> { new ProductPhoto { Url = url } }
             };
         }
 
@@ -134,7 +133,8 @@ namespace Application.DTOs.Mappers
                     .ToList(),
                 ReviewDate: product.ProductReviews ?
                 .Select(pr => pr.ReviewDate)
-                    .ToList()
+                    .ToList(),
+                IsInWishlist: false
 
             );
         }

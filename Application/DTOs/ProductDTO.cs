@@ -23,7 +23,7 @@ namespace Application.DTOs
         List<string>? Review,
         List<decimal>? Rating,
         List<string>? ReviewerName,
-        List<DateTime>? ReviewDate
-
+        List<DateTime>? ReviewDate,
+        bool? IsInWishlist
     );
 }

@@ -1,4 +1,5 @@
 ﻿using Domain.Models.ProductModels;
+using Domain.Models.ShopModels;
 
 namespace Domain.Models
 {
@@ -21,6 +22,7 @@ namespace Domain.Models
         public virtual ICollection<ProductSize> ProductSizes { get; set; }
         public virtual ICollection<ProductPhoto> ProductPhotos { get; set; }
         public virtual ICollection<ProductReviews> ProductReviews { get; set; }
+        public virtual ICollection<WishList> WishLists { get; set; }
         public virtual ICollection<CartItem> CartItems { get; set; }
 
     }

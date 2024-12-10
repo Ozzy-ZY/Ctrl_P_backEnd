@@ -1,6 +1,7 @@
 ﻿using Application.Services;
 using Application.Services.CategorizingModels;
 using Application.Validators;
+using Domain.Models.ShopModels;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +19,7 @@ namespace Application
             services.AddScoped<MaterialService>();
             services.AddScoped<SizeService>();
             services.AddScoped<ProductReviewsService>();
+            services.AddScoped<WishlistService>();
             services.AddScoped<AddressService>();
             services.AddScoped<OrderingService>();
             services.AddValidatorsFromAssemblyContaining<ProductDtoValidator>();

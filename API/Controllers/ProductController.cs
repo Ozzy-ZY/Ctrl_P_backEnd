@@ -33,15 +33,15 @@ namespace API.Controllers
             return Ok(await _productService.CreateProductAsync(productDto));
         }
 
-        [HttpGet("GetAllProducts")]
-        public async Task<IActionResult> GetAllProducts()
+        [HttpGet("GetAllProducts/{userId?}")]
+        public async Task<IActionResult> GetAllProducts(int? userId)
         {
-            return Ok(await _productService.GetAllProductsAsync());
+            return Ok(await _productService.GetAllProductsAsync(userId));
         }
-        [HttpGet("GetProduct/{Id}")]
-        public async Task<IActionResult> GetProduct(int Id)
+        [HttpGet("GetProduct/{Id}/{userId?}")]
+        public async Task<IActionResult> GetProduct(int Id, int? userId)
         {
-            return Ok(await _productService.GetProductAsync(Id));
+            return Ok(await _productService.GetProductAsync(Id,userId));
         }
         [HttpPut("UpdateProduct")]
         [Authorize]

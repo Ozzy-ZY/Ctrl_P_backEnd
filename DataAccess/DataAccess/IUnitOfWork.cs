@@ -15,6 +15,7 @@ namespace Infrastructure.DataAccess
         public IMaterialRepository Materials { get; set; }
         public ISizeRepository Sizes { get; set; }
         public IProductReviewsRepository ProductReviews { get; set; }
+        public IWishlistRepository Wishlists { get; set; }
         public OrderRepository Orders { get; set; }
         public OrderItemRepository OrderItems { get; set; }
         public AddressRepository Addresses { get; set; }

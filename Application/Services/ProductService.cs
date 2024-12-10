@@ -3,6 +3,7 @@ using Application.DTOs.Mappers;
 using Domain.Models;
 using Domain.Models.CategorizingModels;
 using Domain.Models.ProductModels;
+using Domain.Models.ShopModels;
 using Infrastructure.DataAccess;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -16,17 +17,20 @@ namespace Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWebHostEnvironment _environment;
+        private readonly WishlistService _wishlistService;
 
-        public ProductService(IUnitOfWork unitOfWork, IWebHostEnvironment environment) // Add IMapper parameter
+        public ProductService(IUnitOfWork unitOfWork, IWebHostEnvironment environment, WishlistService wishlistService) // Add IMapper parameter
         {
             _environment = environment;
             _unitOfWork = unitOfWork;
+            _wishlistService = wishlistService;
         }
 
-        
 
-        public async Task<int> CreateProductAsync(ProductDTO dto)
+
+        public async Task<ServiceResult> CreateProductAsync(ProductDTO dto)
         {
+            ServiceResult result = new ServiceResult();
             // Generate a unique folder name based on a GUID
             string uploadsFolder = Path.Combine(_environment.WebRootPath, "Products");
             Directory.CreateDirectory(uploadsFolder);
@@ -44,20 +48,38 @@ namespace Application.Services
 
             // Add the product to the database
             await _unitOfWork.Products.AddAsync(product);
-            return await _unitOfWork.CommitAsync();
+            if (await _unitOfWork.CommitAsync() > 0)
+            {
+                result.Success = true;
+                return result;
+            }
+
+            result.Errors.Add("Couldn't add the product");
+            result.Success = false;
+            return result;
         }
 
-        public async Task<IEnumerable<ProductDTO>> GetAllProductsAsync()
+        public async Task<IEnumerable<ProductDTO>> GetAllProductsAsync(int? userId)
         {
             var products = await _unitOfWork.Products.GetAllAsync(
                  null,
                  q => q.Include(p => p.ProductPhotos.OrderBy(photo => photo.Id).Take(1)),
                  q => q.Include(p => p.ProductFrames)
-                       .ThenInclude(pc => pc.Frame)
-            );
-            return products.Select(p => p.ProductAsDto()).ToList();
+                       .ThenInclude(pc => pc.Frame));
+
+            var productDtos = products.Select(p =>
+            {
+                var productDto = p.ProductAsDto();
+                if (userId.HasValue)
+                {
+                    productDto = productDto with { IsInWishlist = _wishlistService.IsProductInWishlistAsync(userId.Value, productDto.Id).Result };
+                }
+                return productDto;
+            });
+
+            return productDtos;
         }
-        public async Task<ProductDTO> GetProductAsync(int Id)
+        public async Task<ProductDTO> GetProductAsync(int Id, int? userId)
         {
             var product = await _unitOfWork.Products.GetAsync(
                 p => p.Id == Id,
@@ -74,11 +96,19 @@ namespace Application.Services
                     .Include(p => p.ProductReviews)
             );
 
-            return product.ProductAsDto();
+            var productDto = product.ProductAsDto();
+
+            if (userId.HasValue)
+            {
+                productDto = productDto with { IsInWishlist = await _wishlistService.IsProductInWishlistAsync(userId.Value, productDto.Id) };
+            }
+
+            return productDto;
         }
 
-        public async Task<int> UpdateProductAsync(ProductDTO dto)
+        public async Task<ServiceResult> UpdateProductAsync(ProductDTO dto)
         {
+            ServiceResult result = new ServiceResult();
             var product = await _unitOfWork.Products.GetAsync(
                 p => p.Id == dto.Id,
                 includeProperties: query => query
@@ -239,11 +269,20 @@ namespace Application.Services
 
             // Save changes
             await _unitOfWork.Products.UpdateAsync(product);
-            return await _unitOfWork.CommitAsync();
+            if (await _unitOfWork.CommitAsync() > 0)
+            {
+                result.Success = true;
+                return result;
+            }
+
+            result.Errors.Add("Couldn't update the product");
+            result.Success = false;
+            return result;
         }
 
-        public async Task<int> DeleteProductAsync(ProductDTO dto)
+        public async Task<ServiceResult> DeleteProductAsync(ProductDTO dto)
         {
+            ServiceResult result = new ServiceResult();
             // Fetch the product to be deleted
             var product = await _unitOfWork.Products.GetAsync(
                 p => p.Id == dto.Id,
@@ -254,12 +293,6 @@ namespace Application.Services
                     .Include(p => p.ProductSizes)
                     .Include(p => p.ProductPhotos)
             );
-
-            if (product == null)
-            {
-                return 0; // Product not found
-            }
-
             // Remove product-category relationships
             foreach (var category in product.ProductCategories)
             {
@@ -299,7 +332,15 @@ namespace Application.Services
             await _unitOfWork.Products.DeleteAsync(product);
 
             // Save changes
-            return await _unitOfWork.CommitAsync();
+            if (await _unitOfWork.CommitAsync() > 0)
+            {
+                result.Success = true;
+                return result;
+            }
+
+            result.Errors.Add("Couldn't delete the product");
+            result.Success = false;
+            return result;
         }
         // Helper method to get the hash of a photo
         private string GetPhotoHash(IFormFile photo)
