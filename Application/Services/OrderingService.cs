@@ -88,6 +88,33 @@ public class OrderingService
     {
         var order = await _unitOfWork.Orders.GetAsync(o=> o.Id == orderId, o => o.OrderItems);
         return order;
+    } 
+    public async Task<ServiceResult> ChangeOrderStatus(int orderId, string newStatus)
+    {
+        var result = new ServiceResult()
+        {
+            Success = false
+        };
+        if (!StaticData.OrderStatuses.Contains(newStatus))
+        {
+            result.Errors.Add($"Status {newStatus} not found");
+            return result;
+        }
+        var order = await _unitOfWork.Orders.GetAsync(o=> o.Id == orderId);
+        if (order == null)
+        {
+            result.Errors.Add("Error getting order");
+            return result;
+        }
+        order.OrderStatus = newStatus;
+        await _unitOfWork.Orders.UpdateAsync(order);
+        if (await _unitOfWork.CommitAsync() > 0)
+        {
+            result.Success = true;
+            return result;
+        }
+        result.Errors.Add("Error updating order");
+        return result;
     }
     
 }

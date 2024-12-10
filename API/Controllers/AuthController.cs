@@ -1,6 +1,11 @@
-﻿using Application.DTOs.AuthModels;
+﻿using System.Security.Claims;
+using Application.DTOs.AuthModels;
 using Application.Services;
+using Azure;
+using Domain.StaticData;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,8 +28,45 @@ namespace API.Controllers
             _validatorLogin = validatorLogin;
         }
 
+        [HttpGet("External-Login")]
+        public IActionResult ExternalLogin(string provider)
+        {
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Auth");
+            var props = new AuthenticationProperties()
+            {
+                RedirectUri = redirectUrl,
+            };
+            return Challenge(props, provider);
+        }
+        [HttpGet("external-login-callback")]
+        public async Task<IActionResult> ExternalLoginCallback()
+        {
+            // Retrieve external authentication result
+            var authenticateResult = 
+                await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            if (!authenticateResult.Succeeded)
+                return Unauthorized();
+
+            var claims = authenticateResult.Principal.Identities.First().Claims.ToArray();
+            var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+
+            // Find or create user in your system
+            if (email == null || name == null)
+            {
+                return Unauthorized("Invalid Email and name");
+            }
+            var user = new AppUserRegisterationDto(email, email, email+name);
+            var registerResult = await _authService.RegistrationAsync(user, StaticData.UserRole);
+
+            // Generate your JWT token
+            var loginResult = await _authService.LoginAsync(new AppUserLoginDto(email, email+name));
+
+            return Ok(loginResult);
+        }
         [HttpPost("RegisterAdmin")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = StaticData.AdminRole)]
         public async Task<IActionResult> RegisterAdmin(AppUserRegisterationDto model)
         {
             var modelState = await _validatorRegister.ValidateAsync(model);
@@ -79,7 +121,6 @@ namespace API.Controllers
         }
 
         [HttpPost("RefreshToken")]
-        [Authorize]
         public async Task<IActionResult> RefreshToken(RequestTokenModel model)
         {
             model.RefreshToken = Uri.UnescapeDataString(model.RefreshToken);
@@ -98,7 +139,7 @@ namespace API.Controllers
         }
 
         [HttpPut("RevokeToken")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = StaticData.AdminRole)]
         public async Task<IActionResult> RevokeToken(RequestTokenModel model)
         {
             model.RefreshToken = Uri.UnescapeDataString(model.RefreshToken);
