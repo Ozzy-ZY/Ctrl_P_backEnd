@@ -12,6 +12,8 @@ namespace Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             // Check if the Admin user already exists before inserting it
+            migrationBuilder.Sql("SET IDENTITY_INSERT AspNetUsers ON");
+
             migrationBuilder.Sql(@"
                 IF NOT EXISTS (SELECT 1 FROM [AspNetUsers] WHERE [Id] = 1)
                 BEGIN
@@ -28,6 +30,7 @@ namespace Infrastructure.Migrations
                     VALUES (1, 1);
                 END
             ");
+            migrationBuilder.Sql("SET IDENTITY_INSERT AspNetUsers OFF");
         }
 
         /// <inheritdoc />

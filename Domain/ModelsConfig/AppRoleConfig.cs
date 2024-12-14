@@ -8,6 +8,5 @@ public class AppRoleConfig : IEntityTypeConfiguration<IdentityRole<int>>
 {
     public void Configure(EntityTypeBuilder<IdentityRole<int>> builder)
     {
-
     }
 }
