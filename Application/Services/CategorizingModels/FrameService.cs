@@ -18,11 +18,12 @@ public class FrameService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<int> CreateFrameAsync(FrameDto frameDto)
+    public async Task<ServiceResult> CreateFrameAsync(FrameDto frameDto)
     {
         var frame = frameDto.ToFrame();
         await _unitOfWork.Frames.AddAsync(frame);
-        return await _unitOfWork.CommitAsync();
+        var result = await _unitOfWork.CommitAsync();
+        return new ServiceResult { Success = result > 0 };
     }
 
     public async Task<IEnumerable<FrameDto>> GetAllFramesAsync()
@@ -37,22 +38,24 @@ public class FrameService
         return frame?.ToDTO();
     }
 
-    public async Task<int> UpdateFrameAsync(FrameDto frameDto)
+    public async Task<ServiceResult> UpdateFrameAsync(FrameDto frameDto)
     {
         var existingFrame = await _unitOfWork.Frames.GetAsync(f => f.Id == frameDto.Id);
-        if (existingFrame == null) return 0;
+        if (existingFrame == null) return new ServiceResult { Success = false, Errors = new List<string> { "Frame not found" } };
 
         existingFrame.Name = frameDto.Name;
 
         await _unitOfWork.Frames.UpdateAsync(existingFrame);
-        return await _unitOfWork.CommitAsync();
+        var result = await _unitOfWork.CommitAsync();
+        return new ServiceResult { Success = result > 0 };
     }
 
-    public async Task<int> DeleteFrameAsync(FrameDto frameDto)
+    public async Task<ServiceResult> DeleteFrameAsync(FrameDto frameDto)
     {
         var frame = frameDto.ToFrame();
 
         await _unitOfWork.Frames.DeleteAsync(frame);
-        return await _unitOfWork.CommitAsync();
+        var result = await _unitOfWork.CommitAsync();
+        return new ServiceResult { Success = result > 0 };
     }
 }

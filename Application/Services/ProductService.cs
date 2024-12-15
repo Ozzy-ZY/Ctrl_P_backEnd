@@ -28,7 +28,7 @@ namespace Application.Services
 
 
 
-        public async Task<ServiceResult> CreateProductAsync(ProductDTO dto)
+        public async Task<ServiceResult> CreateProductAsync(ProductDTOCreate dto)
         {
             ServiceResult result = new ServiceResult();
             // Generate a unique folder name based on a GUID
@@ -64,8 +64,8 @@ namespace Application.Services
             var products = await _unitOfWork.Products.GetAllAsync(
                  null,
                  q => q.Include(p => p.ProductPhotos.OrderBy(photo => photo.Id).Take(1)),
-                 q => q.Include(p => p.ProductFrames)
-                       .ThenInclude(pc => pc.Frame));
+                 q => q.Include(p => p.ProductSizes.OrderBy(f=>f.SizeId).Take(1))
+                       .ThenInclude(pc => pc.Size));
 
             var productDtos = products.Select(p =>
             {

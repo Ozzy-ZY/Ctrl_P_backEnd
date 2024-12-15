@@ -9,23 +9,24 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AllowAnonymous]
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
         private readonly IValidator<ProductDTO> _validator;
+        private readonly IValidator<ProductDTOCreate> _validatorCreate;
 
-        public ProductController(IProductService productService, IValidator<ProductDTO> validator)
+        public ProductController(IProductService productService, IValidator<ProductDTO> validator, IValidator<ProductDTOCreate> validatorCreate)
         {
             _productService = productService;
             _validator = validator;
+            _validatorCreate = validatorCreate;
         }
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreateProduct([FromForm] ProductDTO productDto)
+        public async Task<IActionResult> CreateProduct([FromForm] ProductDTOCreate productDto)
         {
-            ValidationResult result = await _validator.ValidateAsync(productDto);
+            ValidationResult result = await _validatorCreate.ValidateAsync(productDto);
             if (!result.IsValid)
             {
                 return BadRequest(result.Errors);

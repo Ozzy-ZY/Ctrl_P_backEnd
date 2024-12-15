@@ -41,13 +41,13 @@ namespace Infrastructure
                         IssuerSigningKey =
                             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]!)),
                     };
-                })
-                .AddGoogle(googleOptions =>
-                {
-                    googleOptions.ClientId = configuration["Jwt:Google:ClientId"]!;
-                    googleOptions.ClientSecret = configuration["Jwt:Google:ClientSecret"]!;
-                    googleOptions.CallbackPath = "/signin-google";
                 });
+                //.AddGoogle(googleOptions =>
+                //{
+                //    googleOptions.ClientId = configuration["Jwt:Google:ClientId"]!;
+                //    googleOptions.ClientSecret = configuration["Jwt:Google:ClientSecret"]!;
+                //    googleOptions.CallbackPath = "/signin-google";
+                //});
 
             return services;
         }

@@ -18,8 +18,10 @@ namespace Domain.ModelsConfig
             // Set property configurations
             builder.Property(c => c.Name)
                 .IsRequired()  // Ensures the Name is required
-                .HasMaxLength(100);  // Sets maximum length for Name
-
+                .HasMaxLength(100); // Sets maximum length for Name
+            builder.Property(c => c.ImageUrl)
+                .IsRequired() // URL is required
+                .HasMaxLength(500); // Limit the length to 500 characters
             // Optional: Configure a unique constraint if the Name should be unique
             builder.HasIndex(c => c.Name)
                 .IsUnique();

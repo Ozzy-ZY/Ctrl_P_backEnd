@@ -389,3 +389,4 @@ FodyWeavers.xsd
 /DataAccess/DataAccess/DbContextFactory.cs
 /API/wwwroot/Products
 
+/API/wwwroot/Categories
