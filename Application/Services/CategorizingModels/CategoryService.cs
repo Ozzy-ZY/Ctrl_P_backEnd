@@ -1,4 +1,5 @@
-﻿using Application.DTOs;
+﻿using System.Security.Cryptography;
+using Application.DTOs;
 using Application.DTOs.CategorizingModels;
 using Application.DTOs.Mappers.CategorizingModels;
 using Infrastructure.DataAccess;
