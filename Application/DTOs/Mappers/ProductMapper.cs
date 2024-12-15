@@ -8,11 +8,10 @@ namespace Application.DTOs.Mappers
 {
     public static class ProductMapper
     {
-        public static Product DtoAsProductCreate(this ProductDTO dto, string url)
+        public static Product DtoAsProductCreate(this ProductDTOCreate dto, string url)
         {
             return new Product()
             {
-                Id = dto.Id,
                 Name = dto.Name,
                 Description = dto.Description,
                 InStock = dto.UnitsInStock > 0 ? true : false,
@@ -82,60 +81,52 @@ namespace Application.DTOs.Mappers
                 UnitsInStock: product.InStockAmount,
                 Price: product.Price,
                 OldPrice: product.OldPrice,
+                Rating: product.Rating,
                 ProductCategoryIds: product.ProductCategories?
                     .Where(pc => pc.CategoryId != 0)
                     .Select(pc => pc.CategoryId)
-                    .ToList(),
+                    .ToList() ?? new List<int>(),
                 CategoryNames: product.ProductCategories?
-                    .Select(pc => pc.Category?.Name)
-                    .Where(name => !string.IsNullOrEmpty(name))
-                    .Cast<string>()
+                    .Select(pc => pc.Category.Name)
                     .ToList(),
                 ProductFrameIds: product.ProductFrames?
                     .Where(pf => pf.FrameId != 0)
                     .Select(pf => pf.FrameId)
-                    .ToList(),
+                    .ToList() ?? new List<int>(),
                 FramesNames: product.ProductFrames?
-                    .Select(pf => pf.Frame?.Name)
-                    .Where(name => !string.IsNullOrEmpty(name))
-                    .Cast<string>()
+                    .Select(pf => pf.Frame.Name)
                     .ToList(),
                 ProductMaterialIds: product.ProductMaterials?
                     .Where(pm => pm.MaterialId != 0)
                     .Select(pm => pm.MaterialId)
-                    .ToList(),
+                    .ToList() ?? new List<int>(),
                 MaterialsNames: product.ProductMaterials?
-                    .Select(pm => pm.Material?.Name)
-                    .Where(name => !string.IsNullOrEmpty(name))
-                    .Cast<string>()
+                    .Select(pm => pm.Material.Name)
                     .ToList(),
                 ProductSizeIds: product.ProductSizes?
                     .Where(ps => ps.SizeId != 0)
                     .Select(ps => ps.SizeId)
                     .ToList(),
                 SizesNames: product.ProductSizes?
-                    .Select(ps => ps.Size?.Name)
-                    .Where(name => !string.IsNullOrEmpty(name))
-                    .Cast<string>()
-                    .ToList(),
+                    .Select(ps => ps.Size.Name)
+                    .ToList() ,
                 Url: product.ProductPhotos?
                     .Select(pp => pp.Url)
-                    .ToList(),
-                Image: null! ,
+                    .ToList() ?? new List<string>(),
+                Image: null!,
                 Review: product.ProductReviews?
                     .Select(pr => pr.Review)
+                    .ToList() ?? new List<string>(),
+                ReviewRating: product.ProductReviews?
+                    .Select(pr => pr.Rating)
                     .ToList(),
-                Rating: product.ProductReviews ?
-                .Select(pr => pr.Rating)
-                    .ToList(),
-                ReviewerName: product.ProductReviews ?
-                .Select(pr => pr.Name)
-                    .ToList(),
-                ReviewDate: product.ProductReviews ?
-                .Select(pr => pr.ReviewDate)
-                    .ToList(),
+                ReviewerName: product.ProductReviews?
+                    .Select(pr => pr.Name)
+                    .ToList() ?? new List<string>(),
+                ReviewDate: product.ProductReviews?
+                    .Select(pr => pr.ReviewDate)
+                    .ToList() ?? new List<DateTime>(),
                 IsInWishlist: false
-
             );
         }
     }

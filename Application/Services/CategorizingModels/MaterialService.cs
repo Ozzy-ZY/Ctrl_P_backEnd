@@ -9,7 +9,6 @@ namespace Application.Services;
 
 public class MaterialService
 {
-
     private readonly IUnitOfWork _unitOfWork;
     private readonly IWebHostEnvironment _environment;
 
@@ -19,11 +18,12 @@ public class MaterialService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<int> CreateMaterialAsync(MaterialDto materialDto)
+    public async Task<ServiceResult> CreateMaterialAsync(MaterialDto materialDto)
     {
         var material = materialDto.ToMaterial();
         await _unitOfWork.Materials.AddAsync(material);
-        return await _unitOfWork.CommitAsync();
+        var result = await _unitOfWork.CommitAsync();
+        return new ServiceResult { Success = result > 0 };
     }
 
     public async Task<IEnumerable<MaterialDto>> GetAllMaterialsAsync()
@@ -38,22 +38,24 @@ public class MaterialService
         return material?.ToDTO();
     }
 
-    public async Task<int> UpdateMaterialAsync(MaterialDto materialDto)
+    public async Task<ServiceResult> UpdateMaterialAsync(MaterialDto materialDto)
     {
         var existingMaterial = await _unitOfWork.Materials.GetAsync(m => m.Id == materialDto.Id);
-        if (existingMaterial == null) return 0;
+        if (existingMaterial == null) return new ServiceResult { Success = false, Errors = new List<string> { "Material not found" } };
 
         existingMaterial.Name = materialDto.Name;
 
         await _unitOfWork.Materials.UpdateAsync(existingMaterial);
-        return await _unitOfWork.CommitAsync();
+        var result = await _unitOfWork.CommitAsync();
+        return new ServiceResult { Success = result > 0 };
     }
 
-    public async Task<int> DeleteMaterialAsync(MaterialDto materialDto)
+    public async Task<ServiceResult> DeleteMaterialAsync(MaterialDto materialDto)
     {
         var material = materialDto.ToMaterial();
 
         await _unitOfWork.Materials.DeleteAsync(material);
-        return await _unitOfWork.CommitAsync();
+        var result = await _unitOfWork.CommitAsync();
+        return new ServiceResult { Success = result > 0 };
     }
 }

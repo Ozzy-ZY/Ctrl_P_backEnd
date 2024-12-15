@@ -12,15 +12,15 @@ namespace Application.DTOs.Mappers.CategorizingModels
     {
         public static CategoryDto ToDTO(this Category category)
         {
-            return new CategoryDto(category.Id, category.Name);
+            return new CategoryDto(category.Id, category.Name, null!, category.ImageUrl);
         }
-
-        public static Category ToCategory(this CategoryDto categoryDto)
+        public static Category ToCategory(this CategoryDto categoryDto, string url)
         {
             return new Category
             {
                 Id = categoryDto.Id,
-                Name = categoryDto.Name
+                Name = categoryDto.Name,
+                ImageUrl = url
             };
         }
     }
