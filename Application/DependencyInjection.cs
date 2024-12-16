@@ -13,6 +13,7 @@ namespace Application
         {
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ServicesService>();
+            services.AddScoped<UserService>();
             services.AddScoped<CartService>();
             services.AddScoped<CategoryService>();
             services.AddScoped<FrameService>();

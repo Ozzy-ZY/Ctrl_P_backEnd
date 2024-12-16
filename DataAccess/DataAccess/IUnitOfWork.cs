@@ -19,6 +19,7 @@ namespace Infrastructure.DataAccess
         public OrderRepository Orders { get; set; }
         public OrderItemRepository OrderItems { get; set; }
         public AddressRepository Addresses { get; set; }
+        public UserRepository Users { get; set; }
 
         public Task<int> CommitAsync();
         public Task<IDbTransaction> BeginTransactionAsync();
