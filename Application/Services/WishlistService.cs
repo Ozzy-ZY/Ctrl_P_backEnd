@@ -20,6 +20,9 @@ public class WishlistService
         ServiceResult result = new ServiceResult();
         var wishlist = wishlistDto.ToWishlist();
         await _unitOfWork.Wishlists.AddAsync(wishlist);
+        var product = await _unitOfWork.Products.GetAsync(product => product.Id == wishlist.ProductId);
+        product!.RowVersion++;
+        await _unitOfWork.Products.UpdateAsync(product);
         if (await _unitOfWork.CommitAsync() > 0)
         {
             result.Success = true;
@@ -35,6 +38,9 @@ public class WishlistService
     {
         ServiceResult result = new ServiceResult();
         await _unitOfWork.Wishlists.DeleteAsync(wishlistDto.ToWishlist());
+        var product = await _unitOfWork.Products.GetAsync(product => product.Id == wishlistDto.ProductId);
+        product!.RowVersion++;
+        await _unitOfWork.Products.UpdateAsync(product);
         if (await _unitOfWork.CommitAsync() > 0)
         {
             result.Success = true;

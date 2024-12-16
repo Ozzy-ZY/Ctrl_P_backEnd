@@ -19,6 +19,8 @@ namespace Domain.ModelsConfig
                     PasswordHash = "AQAAAAIAAYagAAAAEI/Mz/MSiXslOgbOUm8Tk09JnoF8eNvXacynXqq5IcbhSWm2QvhOgm+xDY/URasS6g==",
                 }
             );
+            builder.Property(u => u.IsLockedOut).IsRequired();
+            builder.Property(u => u.JoinDate).HasDefaultValueSql("GETDATE()");
             builder.Property(x => x.UserName).HasMaxLength(64).IsRequired();
             builder.HasIndex(x => x.UserName).IsUnique();
             builder.HasOne(u => u.Cart)

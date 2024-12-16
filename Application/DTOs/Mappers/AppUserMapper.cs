@@ -12,6 +12,9 @@ namespace Application.DTOs.Mappers
                 Email = dto.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = dto.UserName,
+                FirstName = dto.UserName,// just to be used when first Registered
+                LastName = dto.UserName, // just to be used when first Registered
+                IsLockedOut = false,
             };
         }
     }

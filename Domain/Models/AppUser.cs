@@ -9,6 +9,8 @@ namespace Domain.Models
         public override string UserName { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public DateTime JoinDate { get; set; }
+        public bool IsLockedOut { get; set; }
         public virtual ICollection<RefreshToken>? RefreshTokens { get; set; }
         public virtual ICollection<Address> Addresses { get; set; }
 
