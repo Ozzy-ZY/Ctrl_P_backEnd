@@ -1,5 +1,6 @@
 using Application;
 using Delta;
+using Domain.Models;
 using Infrastructure;
 using Infrastructure.DataAccess;
 using Microsoft.OpenApi.Models;
