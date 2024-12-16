@@ -32,7 +32,7 @@ namespace Application.Services
         {
             ServiceResult result = new ServiceResult();
             // Generate a unique folder name based on a GUID
-            string uploadsFolder = Path.Combine(_environment.WebRootPath, "Products");
+            string uploadsFolder = Path.Combine(_environment.WebRootPath, "Product");
             Directory.CreateDirectory(uploadsFolder);
 
             // Save the product images in the product folder
