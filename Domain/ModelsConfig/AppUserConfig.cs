@@ -14,6 +14,8 @@ namespace Domain.ModelsConfig
                     Id = 1,
                     Email = "Admin@gmail.com",
                     UserName = "Admin",
+                    FirstName = "Admin",
+                    LastName = "Admin",
                     PasswordHash = "AQAAAAIAAYagAAAAEI/Mz/MSiXslOgbOUm8Tk09JnoF8eNvXacynXqq5IcbhSWm2QvhOgm+xDY/URasS6g==",
                 }
             );
@@ -25,6 +27,8 @@ namespace Domain.ModelsConfig
             builder.HasMany(u=> u.Addresses)
                 .WithOne(a => a.User)
                 .HasForeignKey(a => a.UserId);
+            builder.Property(u => u.FirstName).IsRequired();
+            builder.Property(u => u.LastName).IsRequired();
         }
     }
 }
