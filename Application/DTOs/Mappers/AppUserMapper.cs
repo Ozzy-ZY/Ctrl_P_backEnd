@@ -17,5 +17,12 @@ namespace Application.DTOs.Mappers
                 IsLockedOut = false,
             };
         }
+
+        public static void AsAppUser(this UserInfoDTO userInfo, ref AppUser appUser)
+        {
+            appUser.FirstName = userInfo.FirstName;
+            appUser.LastName = userInfo.LastName;
+            appUser.Email = userInfo.Email;
+        }
     }
 }

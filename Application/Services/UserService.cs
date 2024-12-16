@@ -49,13 +49,16 @@ public class UserService
             return result;
         }
 
-        if (user.IsLockedOut == false)
+        switch (user.IsLockedOut)
         {
-            user.IsLockedOut = true;
-            user.RefreshTokens?.Clear();
+            case false:
+                user.IsLockedOut = true;
+                user.RefreshTokens?.Clear();
+                break;
+            case true:
+                user.IsLockedOut = false;
+                break;
         }
-        else if (user.IsLockedOut == true)
-            user.IsLockedOut = false;
         var idResult = await _userManager.UpdateAsync(user);
         if (idResult.Succeeded)
         {
@@ -63,6 +66,46 @@ public class UserService
             return result;
         }
         result.Errors.Add("Toggle Lockout Failed");
+        return result;
+    }
+
+    public async Task<ServiceResult> UpdateUserInformation(UserInfoDTO userInfo, string userId)
+    {
+        var result = new ServiceResult()
+        {
+            Success = false
+        };
+        var user = await _userManager.FindByIdAsync(userId);
+        userInfo.AsAppUser(ref user!);
+        var idResult = await _userManager.UpdateAsync(user);
+        if (idResult.Succeeded)
+        {
+            result.Success = true;
+            return result;
+        }
+        result.Errors.Add("Update Failed");
+        return result;
+    }
+
+    public async Task<ServiceResult> UpdateUserPassword(ChangePasswordDTO passwordDto, string userId)
+    {
+        var result = new ServiceResult()
+        {
+            Success = false
+        };
+        var user = await _userManager.FindByIdAsync(userId);
+        if (!passwordDto.PasswordConfirmation)
+        {
+            result.Errors.Add("Passwords Don't match!");
+            return result;
+        }
+        var idResult = await _userManager.ChangePasswordAsync(user, passwordDto.OldPassword, passwordDto.NewPassword);
+        if (idResult.Succeeded)
+        {
+            result.Success = true;
+            return result;
+        }
+        result.Errors.Add("Password Change Failed");
         return result;
     }
 }
