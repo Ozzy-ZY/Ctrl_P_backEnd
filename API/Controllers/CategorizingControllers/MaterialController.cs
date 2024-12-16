@@ -19,16 +19,16 @@ public class MaterialController : ControllerBase
 
     [HttpPost("add")]
     [Authorize]
-    public async Task<ActionResult<string>> AddMaterial([FromBody] MaterialDto materialDto)
+    public async Task<IActionResult> AddMaterial([FromBody] MaterialDto materialDto)
     {
-        return (await _materialService.CreateMaterialAsync(materialDto)).ToString();
+        return Ok(await _materialService.CreateMaterialAsync(materialDto));
     }
 
     [HttpPut("update")]
     [Authorize]
-    public async Task<ActionResult<string>> UpdateMaterial([FromBody] MaterialDto materialDto)
+    public async Task<IActionResult> UpdateMaterial([FromBody] MaterialDto materialDto)
     {
-        return (await _materialService.UpdateMaterialAsync(materialDto)).ToString();
+        return Ok(await _materialService.UpdateMaterialAsync(materialDto));
     }
 
     [HttpGet("Get-All")]

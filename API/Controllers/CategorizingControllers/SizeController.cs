@@ -19,16 +19,16 @@ public class SizeController : ControllerBase
 
     [HttpPost("add")]
     [Authorize]
-    public async Task<ActionResult<string>> AddSize([FromBody] SizeDto sizeDto)
+    public async Task<IActionResult> AddSize([FromBody] SizeDto sizeDto)
     {
-        return (await _sizeService.CreateSizeAsync(sizeDto)).ToString();
+        return Ok(await _sizeService.CreateSizeAsync(sizeDto));
     }
 
     [HttpPut("update")]
     [Authorize]
-    public async Task<ActionResult<string>> UpdateSize([FromBody] SizeDto sizeDto)
+    public async Task<IActionResult> UpdateSize([FromBody] SizeDto sizeDto)
     {
-        return (await _sizeService.UpdateSizeAsync(sizeDto)).ToString();
+        return Ok(await _sizeService.UpdateSizeAsync(sizeDto));
     }
 
     [HttpGet("Get-All")]
