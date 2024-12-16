@@ -107,6 +107,12 @@ namespace Application.Services
                 return loginResult;
             }
 
+            if (user.IsLockedOut)
+            {
+                loginResult.Success = false;
+                loginResult.Error = "Suspended Account!";
+                return loginResult;
+            }
             var userRoles = await _userManager.GetRolesAsync(user);
             var authClaims = new List<Claim>
             {

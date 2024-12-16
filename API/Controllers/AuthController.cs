@@ -117,7 +117,7 @@ namespace API.Controllers
                 }
                 return Ok(result);
             }
-            return BadRequest(result.Error);
+            return BadRequest(result);
         }
 
         [HttpPost("RefreshToken")]
@@ -135,7 +135,7 @@ namespace API.Controllers
                 return Ok(result);
             }
 
-            return BadRequest(result.Error);
+            return BadRequest(result);
         }
 
         [HttpPut("RevokeToken")]
@@ -148,7 +148,7 @@ namespace API.Controllers
             {
                 return Ok(result);
             }
-            return BadRequest(result.Error);
+            return BadRequest(result);
         }
 
         private void SetRefreshTokenToCookie(string refreshToken, DateTime expiry)
