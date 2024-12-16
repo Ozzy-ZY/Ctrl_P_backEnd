@@ -16,15 +16,15 @@ public class FrameController : ControllerBase
     }
     [HttpPost("add")]
     [Authorize]
-    public async Task<ActionResult<string>> AddFrame([FromBody] FrameDto frameDto)
+    public async Task<IActionResult> AddFrame([FromBody] FrameDto frameDto)
     {
-        return (await _frameService.CreateFrameAsync(frameDto)).ToString();
+        return Ok(await _frameService.CreateFrameAsync(frameDto));
     }
     [HttpPut("update")]
     [Authorize]
-    public async Task<ActionResult<string>> UpdateFrame([FromBody] FrameDto frameDto)
+    public async Task<IActionResult> UpdateFrame([FromBody] FrameDto frameDto)
     {
-        return (await _frameService.UpdateFrameAsync(frameDto)).ToString();
+        return Ok(await _frameService.UpdateFrameAsync(frameDto));
     }
     [HttpGet("Get-All")]
     public async Task<IActionResult> GetAllFrames()

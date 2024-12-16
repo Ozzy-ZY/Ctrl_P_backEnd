@@ -18,16 +18,19 @@ public class CategoryController : ControllerBase
 
     [HttpPost("add")]
     [Authorize]
-    public async Task<ActionResult<string>> AddCategory([FromForm] CategoryDto categoryDto)
+
+    public async Task<IActionResult> AddCategory([FromForm] CategoryDto categoryDto)
     {
-        return (await _categoryService.CreateCategoryAsync(categoryDto)).ToString();
+        return Ok(await _categoryService.CreateCategoryAsync(categoryDto));
     }
 
     [HttpPut("update")]
     [Authorize]
-    public async Task<ActionResult<string>> UpdateCategory([FromForm] CategoryDto categoryDto)
+
+    public async Task<IActionResult> UpdateCategory([FromForm] CategoryDto categoryDto)
+
     {
-        return (await _categoryService.UpdateCategoryAsync(categoryDto)).ToString();
+        return Ok(await _categoryService.UpdateCategoryAsync(categoryDto));
     }
 
     [HttpGet("Get-All")]
@@ -38,7 +41,9 @@ public class CategoryController : ControllerBase
 
     [HttpDelete("Delete")]
     [Authorize]
-    public async Task<ActionResult<string>> DeleteCategory([FromForm] CategoryDto categoryDto)
+
+    public async Task<IActionResult> DeleteCategory([FromForm] CategoryDto categoryDto)
+
     {
         return Ok(await _categoryService.DeleteCategoryAsync(categoryDto));
     }
