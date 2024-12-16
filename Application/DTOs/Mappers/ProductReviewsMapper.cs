@@ -18,7 +18,7 @@ namespace Application.DTOs.Mappers
                 Rating = productReviewDto.Rating,
                 Name = productReviewDto.ReviewerName,
                 Email = productReviewDto.ReviewerEmail,
-                ReviewerId = productReviewDto.ReviewerId,
+                ReviewerId = productReviewDto.ReviewerId!.Value,
                 ProductId = productReviewDto.ProductId,
                 ReviewDate = DateTime.Now
             };

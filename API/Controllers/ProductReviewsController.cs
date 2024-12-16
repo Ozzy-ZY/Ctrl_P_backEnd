@@ -1,4 +1,5 @@
-﻿using Application.DTOs;
+﻿using System.Security.Claims;
+using Application.DTOs;
 using Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +23,8 @@ namespace API.Controllers
         [Authorize]
         public async Task<IActionResult> AddReview([FromBody] ProductReviewsDto review)
         {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            review = review with { ReviewerId = userId };
             return Ok(await _productReviewService.CreateProductReviewAsync(review));
         }
         [HttpPut("update")]
