@@ -18,6 +18,7 @@ namespace Domain.Models
         public virtual ICollection<Order> Orders { get; set; }
         public virtual ICollection<ProductReviews> Reviews { get; set; }
         public virtual ICollection<WishList> WishLists { get; set; }
+        public virtual ICollection<Message> Messages { get; set; }
 
 
     }
