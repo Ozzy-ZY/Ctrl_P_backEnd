@@ -12,7 +12,7 @@ namespace Application.DTOs
          decimal Rating,
          string ReviewerName,
          string ReviewerEmail,
-         int ReviewerId,
+         int? ReviewerId,
          int ProductId
 
     );

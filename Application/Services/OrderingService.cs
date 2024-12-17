@@ -32,12 +32,17 @@ public class OrderingService
             return result;
         }
         var userAddress = await _unitOfWork.Addresses.GetAsync(a=> a.UserId == userId);
+        if (userAddress == null)
+        {
+            result.Errors.Add($"please ensure there's a user address!");
+            return result;
+        }
         var order = new Order()
         {
             OrderDate = DateTime.Now,
             TotalPrice = cartDto.TotalPrice,
             UserId = cartDto.UserId,
-            AddressText = userAddress!.AddressText,
+            AddressText = userAddress!.AddressText, // must have address before accessing this point
             PaymentMethod = paymentMethod,
             OrderStatus = "Created"
         };

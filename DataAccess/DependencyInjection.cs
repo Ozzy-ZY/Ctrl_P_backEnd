@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Stripe;
 
 namespace Infrastructure
 {
@@ -15,7 +16,7 @@ namespace Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<AppDbContext>(options => options
-                .UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+                .UseSqlServer(configuration.GetConnectionString("ProductionDatabase")));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddIdentity<AppUser, IdentityRole<int>>()
@@ -48,7 +49,11 @@ namespace Infrastructure
                 //    googleOptions.ClientSecret = configuration["Jwt:Google:ClientSecret"]!;
                 //    googleOptions.CallbackPath = "/signin-google";
                 //});
-
+            services.Configure<StripModel>(configuration.GetSection("StripModel"));
+            StripeConfiguration.ApiKey = configuration["Stripe:SecretKey"];
+            services.AddScoped<ChargeService>();
+            services.AddScoped<CustomerService>();
+            services.AddScoped<ProductService> ();
             return services;
         }
     }
