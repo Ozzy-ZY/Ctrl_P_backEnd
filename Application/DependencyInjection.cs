@@ -19,6 +19,7 @@ namespace Application
             services.AddScoped<FrameService>();
             services.AddScoped<MaterialService>();
             services.AddScoped<SizeService>();
+            services.AddScoped<MessagesService>();
             services.AddScoped<ProductReviewsService>();
             services.AddScoped<WishlistService>();
             services.AddScoped<AddressService>();

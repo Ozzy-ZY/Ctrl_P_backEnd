@@ -16,7 +16,7 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull; // Optional
-    });;
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddCors(options =>
 {
@@ -54,7 +54,7 @@ app.UseSwagger(options =>
 app.MapScalarApiReference(options =>
 {
     options.WithTitle("Ctrl+P")
-    .WithTheme(ScalarTheme.BluePlanet).WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+    .WithTheme(ScalarTheme.DeepSpace).WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
 });
 //}
 
