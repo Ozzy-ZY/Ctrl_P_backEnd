@@ -25,15 +25,16 @@ namespace Application.DTOs
         bool? IsInWishlist
     );
     public record ProductDTOCreate(
+        int Id,
         string Name,
         string Description,
         decimal Price,
         decimal? OldPrice,
         int UnitsInStock,
-        List<int> ProductCategoryIds,
-        List<int> ProductFrameIds,
-        List<int> ProductMaterialIds,
-        List<int> ProductSizeIds,
+        List<string>? CategoryNames,
+        List<string>? FramesNames,
+        List<string>? MaterialsNames,
+        List<string>? SizesNames,
         List<IFormFile> Image
     );
 }

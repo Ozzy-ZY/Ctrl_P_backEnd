@@ -20,40 +20,41 @@ namespace Infrastructure.DataAccess.Repositories
         }
 
         public async Task<IEnumerable<Product>> GetAllAsync(
+     Expression<Func<Product ,bool>>? predicate = null,
+     params Func<IQueryable<Product>, IIncludableQueryable<Product, object>>[] includeProperties)
+        {
+            IQueryable<Product> query = dbSet;
+
+            // Apply the predicate if provided
+            if (predicate != null)
+                query = query.Where(predicate);
+
+            // Apply the include properties for eager loading
+            foreach (var include in includeProperties)
+                query = include(query);
+
+            // Return the list of entities
+            return await query.ToListAsync();
+        }
+
+        public async Task<Product?> GetAsync(
             Expression<Func<Product, bool>>? predicate = null,
             params Func<IQueryable<Product>, IIncludableQueryable<Product, object>>[] includeProperties)
         {
             IQueryable<Product> query = dbSet;
 
-            if (predicate != null)
-                query = query.Where(predicate);
-            foreach (var include in includeProperties)
-            {
-                query = include(query);
-            }
-            return await query.ToListAsync();
-        }
-
-        public async Task<Product?> GetAsync(Expression<Func<Product, bool>>? predicate = null,
-    params Func<IQueryable<Product>, IIncludableQueryable<Product, object>>[] includeProperties)
-        {
-            IQueryable<Product> query = dbSet; // Start with the base query on the DbSet
-
             // Apply the predicate if provided
             if (predicate != null)
-            {
                 query = query.Where(predicate);
-            }
 
             // Apply the include properties for eager loading
             foreach (var include in includeProperties)
-            {
                 query = include(query);
-            }
 
             // Return the first or default entity matching the query
             return await query.FirstOrDefaultAsync();
         }
+
 
     }
 }

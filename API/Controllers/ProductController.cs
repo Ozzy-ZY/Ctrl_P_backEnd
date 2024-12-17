@@ -46,9 +46,9 @@ namespace API.Controllers
         }
         [HttpPut("UpdateProduct")]
         [Authorize]
-        public async Task<IActionResult> UpdateProduct([FromForm] ProductDTO productDto)
+        public async Task<IActionResult> UpdateProduct([FromForm] ProductDTOCreate productDto)
         {
-            ValidationResult result = await _validator.ValidateAsync(productDto);
+            ValidationResult result = await _validatorCreate.ValidateAsync(productDto);
             if (!result.IsValid)
             {
                 return BadRequest(result.Errors);

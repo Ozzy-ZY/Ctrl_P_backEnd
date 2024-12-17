@@ -31,6 +31,7 @@ namespace Application.Services
         public async Task<ServiceResult> CreateProductAsync(ProductDTOCreate dto)
         {
             ServiceResult result = new ServiceResult();
+
             // Generate a unique folder name based on a GUID
             string uploadsFolder = Path.Combine(_environment.WebRootPath, "Product");
             Directory.CreateDirectory(uploadsFolder);
@@ -38,13 +39,33 @@ namespace Application.Services
             // Save the product images in the product folder
             var productPhotos = await SaveProductImagesAsync(dto.Image, uploadsFolder);
 
-            // Create the product object and set its properties
-            Product product = dto.DtoAsProductCreate(uploadsFolder); // Adjust if needed
+            // Create product object
+            Product product = dto.DtoAsProductCreate(uploadsFolder);
             product.ProductPhotos = productPhotos;
-            product.ProductCategories = dto.ProductCategoryIds?.Select(id => new ProductCategory { CategoryId = id }).ToList() ?? new List<ProductCategory>();
-            product.ProductFrames = dto.ProductFrameIds?.Select(id => new ProductFrame { FrameId = id }).ToList() ?? new List<ProductFrame>();
-            product.ProductMaterials = dto.ProductMaterialIds?.Select(id => new ProductMaterial { MaterialId = id }).ToList() ?? new List<ProductMaterial>();
-            product.ProductSizes = dto.ProductSizeIds?.Select(id => new ProductSize { SizeId = id }).ToList() ?? new List<ProductSize>();
+
+            // Resolve and map categories
+            var categoryEntities = await _unitOfWork.Categories.GetAllAsync(c => dto.CategoryNames.Contains(c.Name));
+            product.ProductCategories = categoryEntities
+                .Select(c => new ProductCategory { CategoryId = c.Id, Product = product })
+                .ToList();
+
+            // Resolve and map frames
+            var frameEntities = await _unitOfWork.Frames.GetAllAsync(f => dto.FramesNames.Contains(f.Name));
+            product.ProductFrames = frameEntities
+                .Select(f => new ProductFrame { FrameId = f.Id, Product = product })
+                .ToList();
+
+            // Resolve and map materials
+            var materialEntities = await _unitOfWork.Materials.GetAllAsync(m => dto.MaterialsNames.Contains(m.Name));
+            product.ProductMaterials = materialEntities
+                .Select(m => new ProductMaterial { MaterialId = m.Id, Product = product })
+                .ToList();
+
+            // Resolve and map sizes
+            var sizeEntities = await _unitOfWork.Sizes.GetAllAsync(s => dto.SizesNames.Contains(s.Name));
+            product.ProductSizes = sizeEntities
+                .Select(s => new ProductSize { SizeId = s.Id, Product = product })
+                .ToList();
 
             // Add the product to the database
             await _unitOfWork.Products.AddAsync(product);
@@ -58,6 +79,9 @@ namespace Application.Services
             result.Success = false;
             return result;
         }
+
+
+
 
         public async Task<IEnumerable<ProductDTO>> GetAllProductsAsync(int? userId)
         {
@@ -106,166 +130,84 @@ namespace Application.Services
             return productDto;
         }
 
-        public async Task<ServiceResult> UpdateProductAsync(ProductDTO dto)
+        public async Task<ServiceResult> UpdateProductAsync(ProductDTOCreate dto)
         {
             ServiceResult result = new ServiceResult();
+
+            // Retrieve the existing product with its related entities
             var product = await _unitOfWork.Products.GetAsync(
                 p => p.Id == dto.Id,
                 includeProperties: query => query
                     .Include(p => p.ProductCategories)
+                    .ThenInclude(pc => pc.Category)
                     .Include(p => p.ProductFrames)
+                    .ThenInclude(pf => pf.Frame)
                     .Include(p => p.ProductMaterials)
+                    .ThenInclude(pm => pm.Material)
                     .Include(p => p.ProductSizes)
+                    .ThenInclude(ps => ps.Size)
                     .Include(p => p.ProductPhotos)
             );
 
-            // Ensure ProductCategories is initialized
+            if (product == null)
+            {
+                result.Errors.Add("Product not found");
+                result.Success = false;
+                return result;
+            }
+
+            // Initialize lists if null
             product.ProductCategories ??= new List<ProductCategory>();
             product.ProductFrames ??= new List<ProductFrame>();
             product.ProductMaterials ??= new List<ProductMaterial>();
             product.ProductSizes ??= new List<ProductSize>();
             product.ProductPhotos ??= new List<ProductPhoto>();
 
-            // Safely retrieve current categories
-            var currentCategories = product.ProductCategories.Select(pc => pc.CategoryId).ToHashSet();
-            var currentFrames = product.ProductFrames.Select(pf => pf.FrameId).ToHashSet();
-            var currentMaterials = product.ProductMaterials.Select(pm => pm.MaterialId).ToHashSet();
-            var currentSizes = product.ProductSizes.Select(ps => ps.SizeId).ToHashSet();
-            var currentPhotos = product.ProductPhotos.ToDictionary(pp => pp.Hash, pp => pp);
+            // Fetch related entities by name
+            var categories = await _unitOfWork.Categories.GetAllAsync(c => dto.CategoryNames.Contains(c.Name));
+            var frames = await _unitOfWork.Frames.GetAllAsync(f => dto.FramesNames.Contains(f.Name));
+            var materials = await _unitOfWork.Materials.GetAllAsync(m => dto.MaterialsNames.Contains(m.Name));
+            var sizes = await _unitOfWork.Sizes.GetAllAsync(s => dto.SizesNames.Contains(s.Name));
 
-            // Handle null for dto.ProductCategories
-            var newCategories = dto.ProductCategoryIds ?? new List<int>();
-            var newFrames = dto.ProductFrameIds ?? new List<int>();
-            var newMaterials = dto.ProductMaterialIds ?? new List<int>();
-            var newSizes = dto.ProductSizeIds ?? new List<int>();
-            var newPhotos = dto.Image?.Select(i => (i, GetPhotoHash(i))).ToList() ?? new List<(IFormFile, string)>();
+            // Update ProductCategories
+            UpdateProductRelationships(
+                product.ProductCategories,
+                categories.Select(c => c.Id).ToHashSet(),
+                pc => pc.CategoryId,
+                id => new ProductCategory { ProductId = product.Id, CategoryId = id }
+            );
 
-            // Find categories to add and remove
-            var categoriesToAdd = newCategories.Where(nc => !currentCategories.Contains(nc)).ToList();
-            var categoriesToRemove = currentCategories.Where(cc => !newCategories.Contains(cc)).ToList();
-            var framesToAdd = newFrames.Where(nf => !currentFrames.Contains(nf)).ToList();
-            var framesToRemove = currentFrames.Where(cf => !newFrames.Contains(cf)).ToList();
-            var materialsToAdd = newMaterials.Where(nm => !currentMaterials.Contains(nm)).ToList();
-            var materialsToRemove = currentMaterials.Where(cm => !newMaterials.Contains(cm)).ToList();
-            var sizesToAdd = newSizes.Where(ns => !currentSizes.Contains(ns)).ToList();
-            var sizesToRemove = currentSizes.Where(cs => !newSizes.Contains(cs)).ToList();
+            // Update ProductFrames
+            UpdateProductRelationships(
+                product.ProductFrames,
+                frames.Select(f => f.Id).ToHashSet(),
+                pf => pf.FrameId,
+                id => new ProductFrame { ProductId = product.Id, FrameId = id }
+            );
 
-            // Find photos to add and remove based on hash
-            var photosToAdd = newPhotos.Where(np => !currentPhotos.ContainsKey(np.Item2)).ToList();
-            var photosToRemove = currentPhotos.Values.Where(cp => !newPhotos.Any(np => np.Item2 == cp.Hash)).ToList();
+            // Update ProductMaterials
+            UpdateProductRelationships(
+                product.ProductMaterials,
+                materials.Select(m => m.Id).ToHashSet(),
+                pm => pm.MaterialId,
+                id => new ProductMaterial { ProductId = product.Id, MaterialId = id }
+            );
 
-            // Remove old product-category relationships
-            var productCategoriesToRemove = product.ProductCategories
-                .Where(pc => categoriesToRemove.Contains(pc.CategoryId))
-                .ToList();
+            // Update ProductSizes
+            UpdateProductRelationships(
+                product.ProductSizes,
+                sizes.Select(s => s.Id).ToHashSet(),
+                ps => ps.SizeId,
+                id => new ProductSize { ProductId = product.Id, SizeId = id }
+            );
 
-            foreach (var category in productCategoriesToRemove)
-            {
-                product.ProductCategories.Remove(category);
-            }
-
-            // Add new product-category relationships
-            foreach (var categoryId in categoriesToAdd)
-            {
-                product.ProductCategories.Add(new ProductCategory
-                {
-                    ProductId = product.Id,
-                    CategoryId = categoryId
-                });
-            }
-
-            // Remove old product-frame relationships
-            var productFramesToRemove = product.ProductFrames
-                .Where(pf => framesToRemove.Contains(pf.FrameId))
-                .ToList();
-
-            foreach (var frame in productFramesToRemove)
-            {
-                product.ProductFrames.Remove(frame);
-            }
-
-            // Add new product-frame relationships
-            foreach (var frameId in framesToAdd)
-            {
-                product.ProductFrames.Add(new ProductFrame
-                {
-                    ProductId = product.Id,
-                    FrameId = frameId
-                });
-            }
-
-            // Remove old product-material relationships
-            var productMaterialsToRemove = product.ProductMaterials
-                .Where(pm => materialsToRemove.Contains(pm.MaterialId))
-                .ToList();
-
-            foreach (var material in productMaterialsToRemove)
-            {
-                product.ProductMaterials.Remove(material);
-            }
-
-            // Add new product-material relationships
-            foreach (var materialId in materialsToAdd)
-            {
-                product.ProductMaterials.Add(new ProductMaterial
-                {
-                    ProductId = product.Id,
-                    MaterialId = materialId
-                });
-            }
-
-            // Remove old product-size relationships
-            var productSizesToRemove = product.ProductSizes
-                .Where(ps => sizesToRemove.Contains(ps.SizeId))
-                .ToList();
-
-            foreach (var size in productSizesToRemove)
-            {
-                product.ProductSizes.Remove(size);
-            }
-
-            // Add new product-size relationships
-            foreach (var sizeId in sizesToAdd)
-            {
-                product.ProductSizes.Add(new ProductSize
-                {
-                    ProductId = product.Id,
-                    SizeId = sizeId
-                });
-            }
-
-            // Remove old product-photo relationships
-            foreach (var photo in photosToRemove)
-            {
-                product.ProductPhotos.Remove(photo);
-                var oldImagePath = Path.Combine(_environment.WebRootPath, photo.Url.TrimStart('/'));
-                if (File.Exists(oldImagePath))
-                {
-                    File.Delete(oldImagePath);
-                }
-            }
-
-            // Add new product-photo relationships
-            foreach (var (photo, hash) in photosToAdd)
-            {
-                string uniqueFilename = Guid.NewGuid().ToString() + Path.GetExtension(photo.FileName);
-                var filePath = Path.Combine(_environment.WebRootPath, "Product", uniqueFilename);
-
-                var directoryPath = Path.GetDirectoryName(filePath);
-                if (!Directory.Exists(directoryPath))
-                {
-                    Directory.CreateDirectory(directoryPath);
-                }
-
-                await using var fileStream = new FileStream(filePath, FileMode.Create);
-                await photo.CopyToAsync(fileStream);
-
-                product.ProductPhotos.Add(new ProductPhoto
-                {
-                    Url = $"/Product/{uniqueFilename}",
-                    Hash = hash
-                });
-            }
+            // Update ProductPhotos
+            await UpdateProductPhotosAsync(product, dto.Image);
+            product.Name = dto.Name;
+            product.Description = dto.Description;
+            product.Price = dto.Price;
+            product.OldPrice = dto.OldPrice;
+            product.InStockAmount = dto.UnitsInStock;
 
             // Save changes
             await _unitOfWork.Products.UpdateAsync(product);
@@ -280,7 +222,81 @@ namespace Application.Services
             return result;
         }
 
-        public async Task<ServiceResult> DeleteProductAsync(ProductDTO dto)
+        // Helper method to update many-to-many relationships
+        private void UpdateProductRelationships<T>(
+            ICollection<T> existingItems,
+            HashSet<int> newIds,
+            Func<T, int> idSelector,
+            Func<int, T> createNewItem)
+        {
+            var existingIds = existingItems.Select(idSelector).ToHashSet();
+
+            // Find items to add and remove
+            var idsToAdd = newIds.Except(existingIds).ToList();
+            var itemsToRemove = existingItems.Where(e => !newIds.Contains(idSelector(e))).ToList();
+
+            // Remove old relationships
+            foreach (var item in itemsToRemove)
+            {
+                existingItems.Remove(item);
+            }
+
+            // Add new relationships
+            foreach (var id in idsToAdd)
+            {
+                existingItems.Add(createNewItem(id));
+            }
+        }
+
+        // Helper method to update product photos
+        private async Task UpdateProductPhotosAsync(Product product, IEnumerable<IFormFile>? images)
+        {
+            if (images == null) return;
+
+            var currentPhotos = product.ProductPhotos.ToDictionary(pp => pp.Hash, pp => pp);
+
+            // Generate new photos with hashes
+            var newPhotos = images.Select(image => (Image: image, Hash: GetPhotoHash(image))).ToList();
+
+            // Find photos to add and remove
+            var photosToAdd = newPhotos.Where(np => !currentPhotos.ContainsKey(np.Hash)).ToList();
+            var photosToRemove = currentPhotos.Values.Where(cp => !newPhotos.Any(np => np.Hash == cp.Hash)).ToList();
+
+            // Remove old photos
+            foreach (var photo in photosToRemove)
+            {
+                product.ProductPhotos.Remove(photo);
+                var oldImagePath = Path.Combine(_environment.WebRootPath, photo.Url.TrimStart('/'));
+                if (File.Exists(oldImagePath))
+                {
+                    File.Delete(oldImagePath);
+                }
+            }
+
+            // Add new photos
+            foreach (var (image, hash) in photosToAdd)
+            {
+                string uniqueFilename = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                var filePath = Path.Combine(_environment.WebRootPath, "Product", uniqueFilename);
+
+                var directoryPath = Path.GetDirectoryName(filePath);
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+
+                await using var fileStream = new FileStream(filePath, FileMode.Create);
+                await image.CopyToAsync(fileStream);
+
+                product.ProductPhotos.Add(new ProductPhoto
+                {
+                    Url = $"/Product/{uniqueFilename}",
+                    Hash = hash
+                });
+            }
+        }
+
+            public async Task<ServiceResult> DeleteProductAsync(ProductDTO dto)
         {
             ServiceResult result = new ServiceResult();
             // Fetch the product to be deleted
