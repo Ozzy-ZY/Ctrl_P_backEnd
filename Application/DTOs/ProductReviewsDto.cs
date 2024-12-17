@@ -12,8 +12,8 @@ namespace Application.DTOs
          decimal Rating,
          string ReviewerName,
          string ReviewerEmail,
+         DateTime? ReviewDate,
          int? ReviewerId,
          int ProductId
-
     );
 }
