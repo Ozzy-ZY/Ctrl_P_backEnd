@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.CategorizingModels;
 using Domain.Models;
+using Domain.Models.CategorizingModels;
 using Domain.Models.ProductModels;
 using System;
 using System.Net.NetworkInformation;
@@ -20,22 +21,25 @@ namespace Application.DTOs.Mappers
                 OldPrice = dto.OldPrice,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
-                ProductCategories = dto.ProductCategoryIds?.Select(id => new ProductCategory
-                {
-                    CategoryId = id
-                }).ToList() ?? new List<ProductCategory>(),
-                ProductFrames = dto.ProductFrameIds?.Select(id => new ProductFrame
-                {
-                    FrameId = id
-                }).ToList() ?? new List<ProductFrame>(),
-                ProductMaterials = dto.ProductMaterialIds?.Select(id => new ProductMaterial
-                {
-                    MaterialId = id
-                }).ToList() ?? new List<ProductMaterial>(),
-                ProductSizes = dto.ProductSizeIds?.Select(id => new ProductSize
-                {
-                    SizeId = id
-                }).ToList() ?? new List<ProductSize>(),
+                // Map Categories
+                ProductCategories = (dto.CategoryNames ?? Enumerable.Empty<string>())
+            .Select(name => new ProductCategory { Category = new Category { Name = name } })
+            .ToList(),
+
+                // Map Frames
+                ProductFrames = (dto.FramesNames ?? Enumerable.Empty<string>())
+            .Select(name => new ProductFrame { Frame = new Frame { Name = name } })
+            .ToList(),
+
+                // Map Materials
+                ProductMaterials = (dto.MaterialsNames ?? Enumerable.Empty<string>())
+            .Select(name => new ProductMaterial { Material = new Material { Name = name } })
+            .ToList(),
+
+                // Map Sizes
+                ProductSizes = (dto.SizesNames ?? Enumerable.Empty<string>())
+            .Select(name => new ProductSize { Size = new Size { Name = name } })
+            .ToList(),
                 ProductPhotos = new List<ProductPhoto> { new ProductPhoto { Url = url } }
             };
         }
