@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Repositories
         where T : class
     {
         public Task<T?> GetAsync(Expression<Func<T, bool>>? predicate = null, params Expression<Func<T, object>>[] includeProperties);
-        public Task<PaginatedList<T>?> GetPaginatedAsync(
+        public Task<PaginatedList<T>> GetPaginatedAsync(
             int pageIndex,
             int pageSize,
             Expression<Func<T, bool>>? predicate = null,

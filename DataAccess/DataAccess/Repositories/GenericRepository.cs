@@ -54,23 +54,36 @@ namespace Infrastructure.DataAccess.Repositories
             return Task.CompletedTask;
         }
 
-        public async Task<PaginatedList<T>?> GetPaginatedAsync(int pageIndex, int pageSize, Expression<Func<T, bool>>? predicate = null,
+        public async Task<PaginatedList<T>> GetPaginatedAsync(
+            int pageIndex, 
+            int pageSize, 
+            Expression<Func<T, bool>>? predicate = null,
             params Expression<Func<T, object>>[] includeProperties)
         {
+            if (pageIndex < 1)
+                throw new ArgumentOutOfRangeException(nameof(pageIndex), "Page index must be greater than 0.");
+            if (pageSize < 1)
+                throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size must be greater than 0.");
+
             IQueryable<T> query = dbSet;
-            if(predicate != null)
+            if (predicate != null)
                 query = query.Where(predicate);
-            foreach (var include in includeProperties)
+
+            // Apply includes
+            if (includeProperties != null)
             {
-                await query.Include(include).LoadAsync();
+                foreach (var include in includeProperties)
+                    query = query.Include(include);
             }
+
             var count = await query.CountAsync();
-            var totalPages = (int)Math.Ceiling((double)count / pageSize);
             var items = await query
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-            return new PaginatedList<T>(items,pageIndex, totalPages); 
+
+            var totalPages = (int)Math.Ceiling((double)count / pageSize);
+            return new PaginatedList<T>(items, pageIndex, totalPages);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null,params Expression<Func<T, object>>[] includeProperties)
