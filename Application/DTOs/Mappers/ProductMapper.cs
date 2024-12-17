@@ -114,18 +114,18 @@ namespace Application.DTOs.Mappers
                     .Select(pp => pp.Url)
                     .ToList() ?? new List<string>(),
                 Image: null!,
-                Review: product.ProductReviews?
-                    .Select(pr => pr.Review)
-                    .ToList() ?? new List<string>(),
-                ReviewRating: product.ProductReviews?
-                    .Select(pr => pr.Rating)
-                    .ToList(),
-                ReviewerName: product.ProductReviews?
-                    .Select(pr => pr.Name)
-                    .ToList() ?? new List<string>(),
-                ReviewDate: product.ProductReviews?
-                    .Select(pr => pr.ReviewDate)
-                    .ToList() ?? new List<DateTime>(),
+                Reviews: product.ProductReviews?
+            .Select(pr => new ProductReviewsDto(
+                Id: pr.Id,
+                Review: pr.Review,
+                ReviewerName: pr.Name,
+                ReviewerEmail: pr.Email,
+                Rating: pr.Rating,
+                ReviewDate: pr.ReviewDate,
+                ReviewerId: pr.ReviewerId,
+                ProductId: pr.ProductId
+            ))
+            .ToList() ?? new List<ProductReviewsDto>(),
                 IsInWishlist: false
             );
         }

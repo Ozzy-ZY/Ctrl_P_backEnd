@@ -21,10 +21,7 @@ namespace Application.DTOs
         List<string>? SizesNames,
         List<string>? Url,
         List<IFormFile>? Image,
-        List<string>? Review,
-        List<decimal>? ReviewRating,
-        List<string>? ReviewerName,
-        List<DateTime>? ReviewDate,
+        List<ProductReviewsDto>? Reviews,
         bool? IsInWishlist
     );
     public record ProductDTOCreate(

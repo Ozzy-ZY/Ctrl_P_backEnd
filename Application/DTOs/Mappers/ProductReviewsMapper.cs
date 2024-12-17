@@ -32,6 +32,7 @@ namespace Application.DTOs.Mappers
                 Rating:productReview.Rating,
                 ReviewerName:productReview.Name,
                 ReviewerEmail:productReview.Email,
+                ReviewDate: productReview.ReviewDate,
                 ReviewerId:productReview.ReviewerId,
                 ProductId:productReview.ProductId
             );
