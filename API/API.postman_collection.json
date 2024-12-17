@@ -904,6 +904,93 @@
         ]
       }
     },
+    "/api/Messages/GetMessagesPage/{pageNumber}/{pageSize}": {
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [ ]
+          }
+        ]
+      }
+    },
+    "/api/Messages/SendMessage": {
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [ ]
+          }
+        ]
+      }
+    },
     "/api/Ordering/add-order": {
       "post": {
         "tags": [
@@ -1057,6 +1144,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "Id": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
                   "Name": {
                     "type": "string"
                   },
@@ -1075,32 +1166,28 @@
                     "type": "integer",
                     "format": "int32"
                   },
-                  "ProductCategoryIds": {
+                  "CategoryNames": {
                     "type": "array",
                     "items": {
-                      "type": "integer",
-                      "format": "int32"
+                      "type": "string"
                     }
                   },
-                  "ProductFrameIds": {
+                  "FramesNames": {
                     "type": "array",
                     "items": {
-                      "type": "integer",
-                      "format": "int32"
+                      "type": "string"
                     }
                   },
-                  "ProductMaterialIds": {
+                  "MaterialsNames": {
                     "type": "array",
                     "items": {
-                      "type": "integer",
-                      "format": "int32"
+                      "type": "string"
                     }
                   },
-                  "ProductSizeIds": {
+                  "SizesNames": {
                     "type": "array",
                     "items": {
-                      "type": "integer",
-                      "format": "int32"
+                      "type": "string"
                     }
                   },
                   "Image": {
@@ -1113,6 +1200,9 @@
                 }
               },
               "encoding": {
+                "Id": {
+                  "style": "form"
+                },
                 "Name": {
                   "style": "form"
                 },
@@ -1128,16 +1218,16 @@
                 "UnitsInStock": {
                   "style": "form"
                 },
-                "ProductCategoryIds": {
+                "CategoryNames": {
                   "style": "form"
                 },
-                "ProductFrameIds": {
+                "FramesNames": {
                   "style": "form"
                 },
-                "ProductMaterialIds": {
+                "MaterialsNames": {
                   "style": "form"
                 },
-                "ProductSizeIds": {
+                "SizesNames": {
                   "style": "form"
                 },
                 "Image": {
@@ -1253,28 +1343,10 @@
                     "type": "integer",
                     "format": "int32"
                   },
-                  "Rating": {
-                    "type": "number",
-                    "format": "double"
-                  },
-                  "ProductCategoryIds": {
-                    "type": "array",
-                    "items": {
-                      "type": "integer",
-                      "format": "int32"
-                    }
-                  },
                   "CategoryNames": {
                     "type": "array",
                     "items": {
                       "type": "string"
-                    }
-                  },
-                  "ProductFrameIds": {
-                    "type": "array",
-                    "items": {
-                      "type": "integer",
-                      "format": "int32"
                     }
                   },
                   "FramesNames": {
@@ -1283,33 +1355,13 @@
                       "type": "string"
                     }
                   },
-                  "ProductMaterialIds": {
-                    "type": "array",
-                    "items": {
-                      "type": "integer",
-                      "format": "int32"
-                    }
-                  },
                   "MaterialsNames": {
                     "type": "array",
                     "items": {
                       "type": "string"
                     }
                   },
-                  "ProductSizeIds": {
-                    "type": "array",
-                    "items": {
-                      "type": "integer",
-                      "format": "int32"
-                    }
-                  },
                   "SizesNames": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "Url": {
                     "type": "array",
                     "items": {
                       "type": "string"
@@ -1321,35 +1373,6 @@
                       "type": "string",
                       "format": "binary"
                     }
-                  },
-                  "Review": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "ReviewRating": {
-                    "type": "array",
-                    "items": {
-                      "type": "number",
-                      "format": "double"
-                    }
-                  },
-                  "ReviewerName": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "ReviewDate": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "format": "date-time"
-                    }
-                  },
-                  "IsInWishlist": {
-                    "type": "boolean"
                   }
                 }
               },
@@ -1372,52 +1395,19 @@
                 "UnitsInStock": {
                   "style": "form"
                 },
-                "Rating": {
-                  "style": "form"
-                },
-                "ProductCategoryIds": {
-                  "style": "form"
-                },
                 "CategoryNames": {
-                  "style": "form"
-                },
-                "ProductFrameIds": {
                   "style": "form"
                 },
                 "FramesNames": {
                   "style": "form"
                 },
-                "ProductMaterialIds": {
-                  "style": "form"
-                },
                 "MaterialsNames": {
-                  "style": "form"
-                },
-                "ProductSizeIds": {
                   "style": "form"
                 },
                 "SizesNames": {
                   "style": "form"
                 },
-                "Url": {
-                  "style": "form"
-                },
                 "Image": {
-                  "style": "form"
-                },
-                "Review": {
-                  "style": "form"
-                },
-                "ReviewRating": {
-                  "style": "form"
-                },
-                "ReviewerName": {
-                  "style": "form"
-                },
-                "ReviewDate": {
-                  "style": "form"
-                },
-                "IsInWishlist": {
                   "style": "form"
                 }
               }
@@ -1544,30 +1534,10 @@
                       "format": "binary"
                     }
                   },
-                  "Review": {
+                  "Reviews": {
                     "type": "array",
                     "items": {
-                      "type": "string"
-                    }
-                  },
-                  "ReviewRating": {
-                    "type": "array",
-                    "items": {
-                      "type": "number",
-                      "format": "double"
-                    }
-                  },
-                  "ReviewerName": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "ReviewDate": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "format": "date-time"
+                      "$ref": "#/components/schemas/ProductReviewsDto"
                     }
                   },
                   "IsInWishlist": {
@@ -1627,16 +1597,7 @@
                 "Image": {
                   "style": "form"
                 },
-                "Review": {
-                  "style": "form"
-                },
-                "ReviewRating": {
-                  "style": "form"
-                },
-                "ReviewerName": {
-                  "style": "form"
-                },
-                "ReviewDate": {
+                "Reviews": {
                   "style": "form"
                 },
                 "IsInWishlist": {
@@ -2113,6 +2074,29 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [ ]
+          }
+        ]
+      }
+    },
+    "/api/Strip/Pay": {
+      "post": {
+        "tags": [
+          "Strip"
+        ],
         "responses": {
           "200": {
             "description": "Success"
@@ -2716,9 +2700,15 @@
             "type": "string",
             "nullable": true
           },
+          "reviewDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
           "reviewerId": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "productId": {
             "type": "integer",
@@ -2735,6 +2725,24 @@
             "nullable": true
           },
           "refreshToken": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SendMessageDTO": {
+        "type": "object",
+        "properties": {
+          "contactEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "subject": {
+            "type": "string",
+            "nullable": true
+          },
+          "content": {
             "type": "string",
             "nullable": true
           }
