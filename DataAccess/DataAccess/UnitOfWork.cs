@@ -27,6 +27,7 @@ namespace Infrastructure.DataAccess
         public AddressRepository Addresses { get; set; }
         public UserRepository Users { get; set; }
         public ICartItemRepository CartItems { get; set; }
+        public MessageRepository Messages { get; set; }
 
         public UnitOfWork(AppDbContext context,
             UserManager<AppUser> userManager,
@@ -49,6 +50,7 @@ namespace Infrastructure.DataAccess
             OrderItems = new OrderItemRepository(context);
             Addresses = new AddressRepository(context);
             Users = new UserRepository(context);
+            Messages = new MessageRepository(context);
         }
 
         public async Task<int> CommitAsync()
