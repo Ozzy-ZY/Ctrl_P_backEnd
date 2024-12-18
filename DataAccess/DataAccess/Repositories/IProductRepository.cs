@@ -16,5 +16,8 @@ namespace Infrastructure.DataAccess.Repositories
         public Task<Product?> GetAsync(Expression<Func<Product, bool>>? predicate = null,
     params Func<IQueryable<Product>, IIncludableQueryable<Product, object>>[] includeProperties);
 
+            IQueryable<Product> Query();
+
+
     }
 }

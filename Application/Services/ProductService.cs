@@ -1,5 +1,6 @@
 ﻿using Application.DTOs;
 using Application.DTOs.Mappers;
+using Application.Services;
 using Domain.Models;
 using Domain.Models.CategorizingModels;
 using Domain.Models.ProductModels;
@@ -504,6 +505,90 @@ namespace Application.Services
             }
 
             return productPhotos;
+        }
+        public async Task<IEnumerable<ProductDTO>> FilterProductsAsync(
+            IEnumerable<int>? categoryIds = null,
+            IEnumerable<int>? frameIds = null,
+            IEnumerable<int>? materialIds = null,
+            IEnumerable<int>? sizeIds = null,
+            decimal? minPrice = null,
+            decimal? maxPrice = null,
+            int? minRating = null,
+            int? maxRating = null,
+            string? nameContains = null,
+            int? userId = null)
+        {
+            var query = _unitOfWork.Products.Query();
+
+            // Filter by category
+            if (categoryIds != null && categoryIds.Any())
+            {
+                query = query.Where(p => p.ProductCategories.Any(pc => categoryIds.Contains(pc.CategoryId)));
+            }
+
+            // Filter by frame
+            if (frameIds != null && frameIds.Any())
+            {
+                query = query.Where(p => p.ProductFrames.Any(pf => frameIds.Contains(pf.FrameId)));
+            }
+
+            // Filter by material
+            if (materialIds != null && materialIds.Any())
+            {
+                query = query.Where(p => p.ProductMaterials.Any(pm => materialIds.Contains(pm.MaterialId)));
+            }
+
+            // Filter by size
+            if (sizeIds != null && sizeIds.Any())
+            {
+                query = query.Where(p => p.ProductSizes.Any(ps => sizeIds.Contains(ps.SizeId)));
+            }
+
+            // Filter by price range
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
+            }
+
+            // Filter by rating
+            if (minRating.HasValue)
+            {
+                query = query.Where(p => p.Rating >= minRating.Value);
+            }
+            if (maxRating.HasValue)
+            {
+                query = query.Where(p => p.Rating <= maxRating.Value);
+            }
+
+            // Filter by product name
+            if (!string.IsNullOrEmpty(nameContains))
+            {
+                query = query.Where(p => p.Name.Contains(nameContains));
+            }
+
+            // Include related data
+            var products = await query
+                .Include(p => p.ProductPhotos.OrderBy(photo => photo.Id).Take(1))
+                .Include(p => p.ProductSizes.OrderBy(f => f.SizeId).Take(1))
+                    .ThenInclude(pc => pc.Size)
+                .ToListAsync();
+
+            // Map to DTOs and include wishlist info if userId is provided
+            var productDtos = products.Select(p =>
+            {
+                var dto = p.ProductAsDto();
+                if (userId.HasValue)
+                {
+                    dto = dto with { IsInWishlist = _wishlistService.IsProductInWishlistAsync(userId.Value, dto.Id).Result };
+                }
+                return dto;
+            });
+
+            return productDtos;
         }
     }
 }
