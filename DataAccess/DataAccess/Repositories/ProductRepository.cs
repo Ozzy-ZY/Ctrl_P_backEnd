@@ -54,7 +54,10 @@ namespace Infrastructure.DataAccess.Repositories
             // Return the first or default entity matching the query
             return await query.FirstOrDefaultAsync();
         }
-
+        public IQueryable<Product> Query()
+        {
+            return _context.Products.AsQueryable();
+        }
 
     }
 }

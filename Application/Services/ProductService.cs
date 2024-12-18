@@ -1,10 +1,12 @@
 ﻿using Application.DTOs;
 using Application.DTOs.Mappers;
+using Application.Services;
 using Domain.Models;
 using Domain.Models.CategorizingModels;
 using Domain.Models.ProductModels;
 using Domain.Models.ShopModels;
 using Infrastructure.DataAccess;
+using Infrastructure.DataAccess.Repositories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -30,56 +32,164 @@ namespace Application.Services
 
         public async Task<ServiceResult> CreateProductAsync(ProductDTOCreate dto)
         {
-            ServiceResult result = new ServiceResult();
+            var result = new ServiceResult();
 
-            // Generate a unique folder name based on a GUID
+            // Validate input DTO
+            if (dto == null)
+            {
+                result.Errors.Add("Product data is null.");
+                return result;
+            }
+
+            if (string.IsNullOrEmpty(dto.Name))
+            {
+                result.Errors.Add("Product name is required.");
+                return result;
+            }
+
+            // Validate categories, frames, materials, and sizes
+            if (dto.CategoryNames == null || !dto.CategoryNames.Any())
+            {
+                result.Errors.Add("At least one category is required.");
+                return result;
+            }
+
+            // Ensure the uploads folder exists
             string uploadsFolder = Path.Combine(_environment.WebRootPath, "Product");
+            if (string.IsNullOrEmpty(_environment.WebRootPath) || !Directory.Exists(_environment.WebRootPath))
+            {
+                result.Errors.Add("Web root path is invalid.");
+                return result;
+            }
             Directory.CreateDirectory(uploadsFolder);
 
-            // Save the product images in the product folder
+            // Save the product images
             var productPhotos = await SaveProductImagesAsync(dto.Image, uploadsFolder);
+            if (productPhotos == null || !productPhotos.Any())
+            {
+                result.Errors.Add("Failed to save product images.");
+                return result;
+            }
 
-            // Create product object
-            Product product = dto.DtoAsProductCreate(uploadsFolder);
+            // Map DTO to Product
+            var product = dto.DtoAsProductCreate(uploadsFolder);
+            if (product == null)
+            {
+                result.Errors.Add("Failed to map product data.");
+                return result;
+            }
+
             product.ProductPhotos = productPhotos;
 
-            // Resolve and map categories
+            // Resolve categories
             var categoryEntities = await _unitOfWork.Categories.GetAllAsync(c => dto.CategoryNames.Contains(c.Name));
+            if (categoryEntities == null || !categoryEntities.Any())
+            {
+                result.Errors.Add("Invalid categories provided.");
+                return result;
+            }
+
             product.ProductCategories = categoryEntities
                 .Select(c => new ProductCategory { CategoryId = c.Id, Product = product })
                 .ToList();
 
-            // Resolve and map frames
+            // Resolve frames
             var frameEntities = await _unitOfWork.Frames.GetAllAsync(f => dto.FramesNames.Contains(f.Name));
+            if (frameEntities == null || !frameEntities.Any())
+            {
+                result.Errors.Add("Invalid frames provided.");
+                return result;
+            }
+
             product.ProductFrames = frameEntities
                 .Select(f => new ProductFrame { FrameId = f.Id, Product = product })
                 .ToList();
 
-            // Resolve and map materials
+            // Resolve materials
             var materialEntities = await _unitOfWork.Materials.GetAllAsync(m => dto.MaterialsNames.Contains(m.Name));
+            if (materialEntities == null || !materialEntities.Any())
+            {
+                result.Errors.Add("Invalid materials provided.");
+                return result;
+            }
+
             product.ProductMaterials = materialEntities
                 .Select(m => new ProductMaterial { MaterialId = m.Id, Product = product })
                 .ToList();
 
-            // Resolve and map sizes
+            // Resolve sizes
             var sizeEntities = await _unitOfWork.Sizes.GetAllAsync(s => dto.SizesNames.Contains(s.Name));
+            if (sizeEntities == null || !sizeEntities.Any())
+            {
+                result.Errors.Add("Invalid sizes provided.");
+                return result;
+            }
+
             product.ProductSizes = sizeEntities
                 .Select(s => new ProductSize { SizeId = s.Id, Product = product })
                 .ToList();
 
-            // Add the product to the database
+            // Add product to the database
             await _unitOfWork.Products.AddAsync(product);
-            if (await _unitOfWork.CommitAsync() > 0)
+
+            if (await _unitOfWork.CommitAsync() <= 0)
             {
-                result.Success = true;
+                result.Errors.Add("Failed to save the product to the database.");
                 return result;
             }
 
-            result.Errors.Add("Couldn't add the product");
-            result.Success = false;
+            result.Success = true;
             return result;
         }
 
+
+
+        private async Task<IEnumerable<TEntity>> ValidateAndFetchEntities<TEntity>(
+    IEnumerable<string> names,
+    IGenericRepository<TEntity> repository,
+    string entityType,
+    ServiceResult result) where TEntity : class
+        {
+            if (names == null || !names.Any())
+            {
+                result.Errors.Add($"{entityType} names are missing");
+                return Enumerable.Empty<TEntity>();
+            }
+
+            // Check if the repository is a ProductRepository
+            if (repository is IProductRepository productRepository && typeof(TEntity) == typeof(Product))
+            {
+                // Use the custom GetAllAsync method from ProductRepository
+                var products = await productRepository.GetAllAsync(
+                    p => names.Contains(EF.Property<string>(p, "Name"))
+                );
+
+                // Cast the result to IEnumerable<TEntity> explicitly
+                var entities = products.Cast<TEntity>();
+
+                // Validate the count
+                if (products == null || products.Count() != names.Count())
+                {
+                    var foundNames = products.Select(p => EF.Property<string>(p, "Name"));
+                    var missing = names.Except(foundNames);
+                    result.Errors.Add($"The following {entityType}(s) were not found: {string.Join(", ", missing)}");
+                }
+
+                return entities;
+            }
+
+            // Fallback for generic repositories (reflection-based)
+            var genericEntities = await repository.GetAllAsync(e => names.Contains((string)e.GetType().GetProperty("Name")!.GetValue(e)));
+
+            if (genericEntities == null || genericEntities.Count() != names.Count())
+            {
+                var foundNames = genericEntities.Select(e => (string)e.GetType().GetProperty("Name")!.GetValue(e));
+                var missing = names.Except(foundNames);
+                result.Errors.Add($"The following {entityType}(s) were not found: {string.Join(", ", missing)}");
+            }
+
+            return genericEntities;
+        }
 
 
 
@@ -134,7 +244,7 @@ namespace Application.Services
         {
             ServiceResult result = new ServiceResult();
 
-            // Retrieve the existing product with its related entities
+            // Step 1: Retrieve the existing product with its related entities
             var product = await _unitOfWork.Products.GetAsync(
                 p => p.Id == dto.Id,
                 includeProperties: query => query
@@ -156,44 +266,37 @@ namespace Application.Services
                 return result;
             }
 
-            // Initialize lists if null
-            product.ProductCategories ??= new List<ProductCategory>();
-            product.ProductFrames ??= new List<ProductFrame>();
-            product.ProductMaterials ??= new List<ProductMaterial>();
-            product.ProductSizes ??= new List<ProductSize>();
-            product.ProductPhotos ??= new List<ProductPhoto>();
+            // Step 2: Validate and fetch related entities
+            var categories = await ValidateAndFetchEntities(dto.CategoryNames, _unitOfWork.Categories, "Category", result);
+            var frames = await ValidateAndFetchEntities(dto.FramesNames, _unitOfWork.Frames, "Frame", result);
+            var materials = await ValidateAndFetchEntities(dto.MaterialsNames, _unitOfWork.Materials, "Material", result);
+            var sizes = await ValidateAndFetchEntities(dto.SizesNames, _unitOfWork.Sizes, "Size", result);
 
-            // Fetch related entities by name
-            var categories = await _unitOfWork.Categories.GetAllAsync(c => dto.CategoryNames.Contains(c.Name));
-            var frames = await _unitOfWork.Frames.GetAllAsync(f => dto.FramesNames.Contains(f.Name));
-            var materials = await _unitOfWork.Materials.GetAllAsync(m => dto.MaterialsNames.Contains(m.Name));
-            var sizes = await _unitOfWork.Sizes.GetAllAsync(s => dto.SizesNames.Contains(s.Name));
+            if (result.Errors.Any())
+            {
+                result.Success = false;
+                return result;
+            }
 
-            // Update ProductCategories
+            // Step 3: Update relationships
             UpdateProductRelationships(
                 product.ProductCategories,
                 categories.Select(c => c.Id).ToHashSet(),
                 pc => pc.CategoryId,
                 id => new ProductCategory { ProductId = product.Id, CategoryId = id }
             );
-
-            // Update ProductFrames
             UpdateProductRelationships(
                 product.ProductFrames,
                 frames.Select(f => f.Id).ToHashSet(),
                 pf => pf.FrameId,
                 id => new ProductFrame { ProductId = product.Id, FrameId = id }
             );
-
-            // Update ProductMaterials
             UpdateProductRelationships(
                 product.ProductMaterials,
                 materials.Select(m => m.Id).ToHashSet(),
                 pm => pm.MaterialId,
                 id => new ProductMaterial { ProductId = product.Id, MaterialId = id }
             );
-
-            // Update ProductSizes
             UpdateProductRelationships(
                 product.ProductSizes,
                 sizes.Select(s => s.Id).ToHashSet(),
@@ -201,15 +304,26 @@ namespace Application.Services
                 id => new ProductSize { ProductId = product.Id, SizeId = id }
             );
 
-            // Update ProductPhotos
-            await UpdateProductPhotosAsync(product, dto.Image);
+            // Step 4: Update product photos
+            try
+            {
+                await UpdateProductPhotosAsync(product, dto.Image);
+            }
+            catch (Exception ex)
+            {
+                result.Errors.Add($"Failed to update product photos: {ex.Message}");
+                result.Success = false;
+                return result;
+            }
+
+            // Step 5: Update other product details
             product.Name = dto.Name;
             product.Description = dto.Description;
             product.Price = dto.Price;
             product.OldPrice = dto.OldPrice;
             product.InStockAmount = dto.UnitsInStock;
 
-            // Save changes
+            // Step 6: Save changes
             await _unitOfWork.Products.UpdateAsync(product);
             if (await _unitOfWork.CommitAsync() > 0)
             {
@@ -217,7 +331,7 @@ namespace Application.Services
                 return result;
             }
 
-            result.Errors.Add("Couldn't update the product");
+            result.Errors.Add("Couldn't save the updated product");
             result.Success = false;
             return result;
         }
@@ -391,6 +505,90 @@ namespace Application.Services
             }
 
             return productPhotos;
+        }
+        public async Task<IEnumerable<ProductDTO>> FilterProductsAsync(
+            IEnumerable<int>? categoryIds = null,
+            IEnumerable<int>? frameIds = null,
+            IEnumerable<int>? materialIds = null,
+            IEnumerable<int>? sizeIds = null,
+            decimal? minPrice = null,
+            decimal? maxPrice = null,
+            int? minRating = null,
+            int? maxRating = null,
+            string? nameContains = null,
+            int? userId = null)
+        {
+            var query = _unitOfWork.Products.Query();
+
+            // Filter by category
+            if (categoryIds != null && categoryIds.Any())
+            {
+                query = query.Where(p => p.ProductCategories.Any(pc => categoryIds.Contains(pc.CategoryId)));
+            }
+
+            // Filter by frame
+            if (frameIds != null && frameIds.Any())
+            {
+                query = query.Where(p => p.ProductFrames.Any(pf => frameIds.Contains(pf.FrameId)));
+            }
+
+            // Filter by material
+            if (materialIds != null && materialIds.Any())
+            {
+                query = query.Where(p => p.ProductMaterials.Any(pm => materialIds.Contains(pm.MaterialId)));
+            }
+
+            // Filter by size
+            if (sizeIds != null && sizeIds.Any())
+            {
+                query = query.Where(p => p.ProductSizes.Any(ps => sizeIds.Contains(ps.SizeId)));
+            }
+
+            // Filter by price range
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
+            }
+
+            // Filter by rating
+            if (minRating.HasValue)
+            {
+                query = query.Where(p => p.Rating >= minRating.Value);
+            }
+            if (maxRating.HasValue)
+            {
+                query = query.Where(p => p.Rating <= maxRating.Value);
+            }
+
+            // Filter by product name
+            if (!string.IsNullOrEmpty(nameContains))
+            {
+                query = query.Where(p => p.Name.Contains(nameContains));
+            }
+
+            // Include related data
+            var products = await query
+                .Include(p => p.ProductPhotos.OrderBy(photo => photo.Id).Take(1))
+                .Include(p => p.ProductSizes.OrderBy(f => f.SizeId).Take(1))
+                    .ThenInclude(pc => pc.Size)
+                .ToListAsync();
+
+            // Map to DTOs and include wishlist info if userId is provided
+            var productDtos = products.Select(p =>
+            {
+                var dto = p.ProductAsDto();
+                if (userId.HasValue)
+                {
+                    dto = dto with { IsInWishlist = _wishlistService.IsProductInWishlistAsync(userId.Value, dto.Id).Result };
+                }
+                return dto;
+            });
+
+            return productDtos;
         }
     }
 }

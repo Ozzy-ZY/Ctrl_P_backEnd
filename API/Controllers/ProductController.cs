@@ -63,5 +63,23 @@ namespace API.Controllers
         {
             return Ok(await _productService.DeleteProductAsync(productDto));
         }
+
+        [HttpGet("filter")]
+        public async Task<IActionResult> FilterProducts(
+            [FromQuery] IEnumerable<int>? categoryIds,
+            [FromQuery] IEnumerable<int>? frameIds,
+            [FromQuery] IEnumerable<int>? materialIds,
+            [FromQuery] IEnumerable<int>? sizeIds,
+            [FromQuery] decimal? minPrice,
+            [FromQuery] decimal? maxPrice,
+            [FromQuery] int? minRating,
+            [FromQuery] int? maxRating,
+            [FromQuery] string? nameContains,
+            [FromQuery] int? userId)
+        {
+
+            return Ok(await _productService.FilterProductsAsync(categoryIds, frameIds, materialIds, sizeIds,minPrice, maxPrice, minRating, maxRating, nameContains, userId));
+        }
+
     }
 }
