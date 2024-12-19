@@ -63,4 +63,17 @@ public class OrderingController: ControllerBase
         }
         return BadRequest(result);
     }
+
+    [HttpGet("Get-Order-Details{orderId:int}")]
+    [Authorize]
+    public async Task<IActionResult> GetOrderDetails(int orderId)
+    {
+        var result = await _orderingService.GetOrderDetailsById(orderId);
+        if (result == null)
+        {
+            return NoContent();
+        }
+
+        return Ok(result);
+    }
 }

@@ -72,8 +72,11 @@ public class CartService
         var cartItem = await _unitOfWork.CartItems.GetAsync(ci => ci.CartId == cart.Id);
         if (cartItem == null)
             return false;
-        await _unitOfWork.CartItems.DeleteAsync(cartItem!);
+        cartItem.Quantity -= addToCartDTO.Quantity;
+        if(cartItem.Quantity == 0)
+            await _unitOfWork.CartItems.DeleteAsync(cartItem!);
         var product = await _unitOfWork.Products.GetAsync(p => p.Id == addToCartDTO.ProductId);
+        cart.TotalPrice -= addToCartDTO.Quantity * product!.Price;
         product!.InStockAmount += addToCartDTO.Quantity;
         await _unitOfWork.Products.UpdateAsync(product);
         if (await _unitOfWork.CommitAsync() > 0)

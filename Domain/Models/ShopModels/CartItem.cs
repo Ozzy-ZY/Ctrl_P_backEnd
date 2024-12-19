@@ -16,6 +16,7 @@ public class CartItem
     [Required, ForeignKey("Product")]
     public int ProductId { get; set; }
     public int Quantity { get; set; }
+
     public DateTime AddedAt { get; set; }
     [JsonIgnore]
     public virtual Cart Cart { get; set; }

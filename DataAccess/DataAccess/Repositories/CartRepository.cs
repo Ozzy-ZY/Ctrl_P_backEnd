@@ -17,4 +17,12 @@ public class CartRepository:GenericRepository<Cart>,ICartRepository
         return (await _context.Carts.Include(c=> c.CartItems)
             .FirstOrDefaultAsync(c => c.UserId == userId))!;
     }
+
+    public async Task ClearCartAsync(int userId)
+    {
+        var cart = await _context.Carts
+            .Include(c=> c.CartItems)
+            .FirstOrDefaultAsync(c => c.UserId == userId);
+        cart?.CartItems.Clear();
+    }
 }
