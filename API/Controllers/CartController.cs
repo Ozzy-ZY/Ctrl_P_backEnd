@@ -18,7 +18,7 @@ public class CartController: ControllerBase
 
     [HttpGet("GetCartWithItems")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [Authorize(Roles = "Admin, User")]
+    [Authorize(Roles = "User")]
     public async Task<IActionResult> GetCartWithItems()
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
@@ -27,7 +27,7 @@ public class CartController: ControllerBase
     }
     [HttpPost("AddItemToCart")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [Authorize(Roles = "Admin, User")]
+    [Authorize(Roles = "User")]
     public async Task<IActionResult> AddItemToCart(AddToCartDTO request)
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
@@ -43,7 +43,7 @@ public class CartController: ControllerBase
     }
 
     [HttpDelete("EmptyTheCart")]
-    [Authorize(Roles = "Admin, User")]
+    [Authorize(Roles = "User")]
     public async Task<IActionResult> EmptyTheCart()
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
