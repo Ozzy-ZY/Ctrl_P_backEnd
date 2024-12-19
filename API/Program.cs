@@ -4,6 +4,7 @@ using Domain.Models;
 using Infrastructure;
 using Infrastructure.DataAccess;
 using Microsoft.OpenApi.Models;
+using NReco.Logging.File;
 using Scalar.AspNetCore;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -26,6 +27,9 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod()     
             .AllowAnyHeader();
     });
+});
+builder.Services.AddLogging(loggingBuilder => {
+    loggingBuilder.AddFile("app.log", append:true);
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

@@ -23,9 +23,9 @@ public class OrderingService
         {
             Success = false
         };
-        var main = await _unitOfWork.Carts.GetCartWithItemsAsync(userId);
-        var cartDto = main!.ToCartDTO();
-        var cartItems = main!.CartItems.ToList();
+        var mainCart = await _unitOfWork.Carts.GetCartWithItemsAsync(userId);
+        var cartDto = mainCart!.ToCartDTO();
+        var cartItems = mainCart!.CartItems.ToList();
         if (cartItems.Count == 0)
         {
             result.Errors.Add("Cart is Empty!");
@@ -59,6 +59,7 @@ public class OrderingService
                 Price = ((await _unitOfWork.Products.GetAsync(product => product.Id == cartItems[i].ProductId))!).Price
             });
         }
+
         await _unitOfWork.OrderItems.AddBulkAsync(orderItems);
         if (await _unitOfWork.CommitAsync() > 0)
         {
