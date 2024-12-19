@@ -21,6 +21,7 @@ namespace Application
             services.AddScoped<SizeService>();
             services.AddScoped<MessagesService>();
             services.AddScoped<ProductReviewsService>();
+            services.AddHostedService<DataCleanupService>();
             services.AddScoped<WishlistService>();
             services.AddScoped<AddressService>();
             services.AddScoped<OrderingService>();
