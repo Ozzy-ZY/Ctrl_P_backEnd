@@ -23,5 +23,9 @@ namespace Application.DTOs.Mappers.CategorizingModels
                 ImageUrl = url
             };
         }
+        public static CategoryDtoDelete ToDTODelete(this Category category)
+        {
+            return new CategoryDtoDelete(category.Id);
+        }
     }
 }

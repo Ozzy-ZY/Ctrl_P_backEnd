@@ -9,4 +9,5 @@ using static System.Net.Mime.MediaTypeNames;
 namespace Application.DTOs.CategorizingModels
 {
     public record CategoryDto(int Id, string Name, IFormFile Image, string? ImageUrl);
+    public record CategoryDtoDelete(int Id);
 }

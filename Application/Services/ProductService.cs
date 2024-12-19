@@ -410,7 +410,7 @@ namespace Application.Services
             }
         }
 
-            public async Task<ServiceResult> DeleteProductAsync(ProductDTO dto)
+            public async Task<ServiceResult> DeleteProductAsync(ProductDtoDelete dto)
         {
             ServiceResult result = new ServiceResult();
             // Fetch the product to be deleted

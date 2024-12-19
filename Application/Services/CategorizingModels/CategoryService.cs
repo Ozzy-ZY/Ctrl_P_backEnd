@@ -78,7 +78,7 @@ namespace Application.Services
             return result;
         }
 
-        public async Task<ServiceResult> DeleteCategoryAsync(CategoryDto categoryDto)
+        public async Task<ServiceResult> DeleteCategoryAsync(CategoryDtoDelete categoryDto)
         {
             var result = new ServiceResult();
 

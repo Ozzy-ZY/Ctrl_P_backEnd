@@ -37,4 +37,7 @@ namespace Application.DTOs
         List<string>? SizesNames,
         List<IFormFile> Image
     );
+    public record ProductDtoDelete(
+        int Id
+    );
 }
