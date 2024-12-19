@@ -2,6 +2,7 @@
 using Application.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
 using System.Security.Claims;
 
 namespace API.Controllers
@@ -20,6 +21,8 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToWishlist([FromBody] WishlistDto wishlistDto)
         {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            wishlistDto = wishlistDto with { UserId = userId };
             return Ok(await _wishlistService.AddToWishlistAsync(wishlistDto));
         }
         [HttpGet("GetWishlistforUser")]
