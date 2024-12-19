@@ -133,5 +133,11 @@ namespace Application.DTOs.Mappers
                 IsInWishlist: false
             );
         }
+        public static ProductDtoDelete ProductAsDtoDelete(this Product product)
+        {
+            return new ProductDtoDelete(
+                Id: product.Id
+            );
+        }
     }
 }

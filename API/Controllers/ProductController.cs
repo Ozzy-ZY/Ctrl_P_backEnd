@@ -4,6 +4,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -34,14 +35,31 @@ namespace API.Controllers
             return Ok(await _productService.CreateProductAsync(productDto));
         }
 
-        [HttpGet("GetAllProducts/{userId?}")]
-        public async Task<IActionResult> GetAllProducts(int? userId)
+        [HttpGet("GetAllProducts")]
+        public async Task<IActionResult> GetAllProducts()
         {
+            int? userId = null;
+
+            // Check if the user is authenticated and extract userId from the token
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                if (User.Identity?.IsAuthenticated == true)
+                {
+                    userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+                }
+            }
             return Ok(await _productService.GetAllProductsAsync(userId));
         }
-        [HttpGet("GetProduct/{Id}/{userId?}")]
-        public async Task<IActionResult> GetProduct(int Id, int? userId)
+        [HttpGet("GetProduct/{Id}")]
+        public async Task<IActionResult> GetProduct(int Id)
         {
+            int? userId = null;
+
+            // Check if the user is authenticated and extract userId from the token
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            }
             return Ok(await _productService.GetProductAsync(Id,userId));
         }
         [HttpPut("UpdateProduct")]
@@ -59,7 +77,7 @@ namespace API.Controllers
 
         [HttpDelete("DeleteProduct")]
         [Authorize]
-        public async Task<IActionResult> DeleteProduct([FromForm] ProductDTO productDto)
+        public async Task<IActionResult> DeleteProduct([FromBody] ProductDtoDelete productDto)
         {
             return Ok(await _productService.DeleteProductAsync(productDto));
         }

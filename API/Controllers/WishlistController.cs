@@ -2,6 +2,7 @@
 using Application.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -21,10 +22,14 @@ namespace API.Controllers
         {
             return Ok(await _wishlistService.AddToWishlistAsync(wishlistDto));
         }
-        [HttpGet("GetWishlistfor/{Id}")]
-        public async Task<IActionResult> GetWishlist(int Id)
+        [HttpGet("GetWishlistforUser")]
+        public async Task<IActionResult> GetWishlist()
         {
-            return Ok(await _wishlistService.GetAllWishlistAsync(Id));
+
+            // Check if the user is authenticated and extract userId from the token
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+
+            return Ok(await _wishlistService.GetAllWishlistAsync(userId));
         }
         [HttpDelete]
         public async Task<IActionResult> RemoveFromWishlist([FromBody] WishlistDto wishlistDto)

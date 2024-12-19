@@ -42,7 +42,7 @@ public class CategoryController : ControllerBase
     [HttpDelete("Delete")]
     [Authorize]
 
-    public async Task<IActionResult> DeleteCategory([FromForm] CategoryDto categoryDto)
+    public async Task<IActionResult> DeleteCategory([FromBody] CategoryDtoDelete categoryDto)
 
     {
         return Ok(await _categoryService.DeleteCategoryAsync(categoryDto));
