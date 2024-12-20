@@ -466,8 +466,8 @@ namespace Application.Services
         }
 
 
-
         public async Task<ServiceResult> DeleteProductAsync(int ProductId)
+
         {
             ServiceResult result = new ServiceResult();
             // Fetch the product to be deleted
