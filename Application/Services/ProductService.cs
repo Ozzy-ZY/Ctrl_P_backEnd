@@ -410,12 +410,12 @@ namespace Application.Services
             }
         }
 
-            public async Task<ServiceResult> DeleteProductAsync(ProductDtoDelete dto)
+            public async Task<ServiceResult> DeleteProductAsync(int ProductId)
         {
             ServiceResult result = new ServiceResult();
             // Fetch the product to be deleted
             var product = await _unitOfWork.Products.GetAsync(
-                p => p.Id == dto.Id,
+                p => p.Id == ProductId,
                 includeProperties: query => query
                     .Include(p => p.ProductCategories)
                     .Include(p => p.ProductFrames)

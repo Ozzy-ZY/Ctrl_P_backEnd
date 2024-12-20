@@ -17,7 +17,7 @@ namespace Infrastructure
         {
             
             services.AddDbContext<AppDbContext>(options => options
-                .UseSqlServer(configuration.GetConnectionString("ProductionDatabase")));
+                .UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddIdentity<AppUser, IdentityRole<int>>()

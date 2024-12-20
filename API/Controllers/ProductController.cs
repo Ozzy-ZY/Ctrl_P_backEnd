@@ -75,11 +75,11 @@ namespace API.Controllers
             return Ok(await _productService.UpdateProductAsync(productDto));
         }
 
-        [HttpDelete("DeleteProduct")]
+        [HttpDelete("DeleteProduct/{ProductId}")]
         [Authorize]
-        public async Task<IActionResult> DeleteProduct([FromBody] ProductDtoDelete productDto)
+        public async Task<IActionResult> DeleteProduct(int ProductId)
         {
-            return Ok(await _productService.DeleteProductAsync(productDto));
+            return Ok(await _productService.DeleteProductAsync(ProductId));
         }
 
         [HttpGet("filter")]

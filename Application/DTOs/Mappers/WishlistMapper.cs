@@ -15,18 +15,24 @@ namespace Application.DTOs.Mappers;
     }
     public static WishlistDto ToDTO(this WishList wishlist)
     {
-            return new WishlistDto(
-                wishlist.UserId,
-                wishlist.ProductId,
-                wishlist.Product.Name,
-                wishlist.Product.Description,
-                wishlist.Product.Price,
-                wishlist.Product.InStockAmount,
-                wishlist.Product.ProductFrames.Select(pf => pf.FrameId).ToList(),
-                wishlist.Product.ProductFrames.Select(pf => pf.Frame.Name).ToList(),
-                wishlist.Product.ProductPhotos.OrderBy(photo => photo.Id).Take(1).Select(photo => photo.Url).ToList(),
-                IsInWishlist: false
-            );
+        if (wishlist == null) throw new ArgumentNullException(nameof(wishlist));
+        if (wishlist.Product == null) throw new ArgumentNullException(nameof(wishlist.Product));
+
+        return new WishlistDto(
+            wishlist.UserId,
+            wishlist.ProductId,
+            wishlist.Product.Name ?? string.Empty, // Handle potential null
+            wishlist.Product.Description ?? string.Empty, // Handle potential null
+            wishlist.Product.Price,
+            wishlist.Product.InStockAmount,
+            wishlist.Product.Rating,
+            wishlist.Product.OldPrice,
+            wishlist.Product.ProductSizes?.Select(pf => pf.SizeId).ToList() ?? new List<int>(), // Null safety
+            wishlist.Product.ProductSizes?.Select(pf => pf.Size?.Name ?? string.Empty).ToList() ?? new List<string>(), // Null safety
+            wishlist.Product.ProductPhotos?.OrderBy(photo => photo.Id).Take(1).Select(photo => photo.Url ?? string.Empty).ToList() ?? new List<string>(), // Null safety
+            IsInWishlist: false
+        );
     }
+
 }
 
