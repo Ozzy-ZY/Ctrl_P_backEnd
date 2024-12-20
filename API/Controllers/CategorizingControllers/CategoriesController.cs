@@ -39,12 +39,12 @@ public class CategoryController : ControllerBase
         return Ok(await _categoryService.GetAllCategoriesAsync());
     }
 
-    [HttpDelete("Delete")]
+    [HttpDelete("DeleteCategory/{CategoryId}")]
     [Authorize]
 
-    public async Task<IActionResult> DeleteCategory([FromBody] CategoryDtoDelete categoryDto)
+    public async Task<IActionResult> DeleteCategory(int CategoryId)
 
     {
-        return Ok(await _categoryService.DeleteCategoryAsync(categoryDto));
+        return Ok(await _categoryService.DeleteCategoryAsync(CategoryId));
     }
 }

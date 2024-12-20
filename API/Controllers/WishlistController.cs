@@ -34,10 +34,10 @@ namespace API.Controllers
 
             return Ok(await _wishlistService.GetAllWishlistAsync(userId));
         }
-        [HttpDelete]
-        public async Task<IActionResult> RemoveFromWishlist([FromBody] WishlistDto wishlistDto)
+        [HttpDelete("RemoveItemFromWishlist/{ProductId}")]
+        public async Task<IActionResult> RemoveFromWishlist(int ProductId)
         {
-            return Ok(await _wishlistService.RemoveFromWishlistAsync(wishlistDto));
+            return Ok(await _wishlistService.RemoveFromWishlistAsync(ProductId));
         }
     }
 }

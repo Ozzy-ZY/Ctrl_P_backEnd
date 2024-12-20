@@ -78,12 +78,12 @@ namespace Application.Services
             return result;
         }
 
-        public async Task<ServiceResult> DeleteCategoryAsync(CategoryDtoDelete categoryDto)
+        public async Task<ServiceResult> DeleteCategoryAsync(int CategoryId)
         {
             var result = new ServiceResult();
 
-                var existingCategory = await _unitOfWork.Categories.GetAsync(c => c.Id == categoryDto.Id)
-                    ?? throw new KeyNotFoundException($"Category with ID {categoryDto.Id} not found.");
+                var existingCategory = await _unitOfWork.Categories.GetAsync(c => c.Id == CategoryId)
+                    ?? throw new KeyNotFoundException($"Category with ID {CategoryId} not found.");
 
                 await DeleteImageAsync(existingCategory.ImageUrl);
                 await _unitOfWork.Categories.DeleteAsync(existingCategory);

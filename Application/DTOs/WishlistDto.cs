@@ -14,8 +14,10 @@ namespace Application.DTOs
         string? Description,
         decimal? Price,
         int? UnitsInStock,
+        decimal? Rating,
+        decimal? OldPrice,
         List<int>? ProductFrameIds,
-        List<string>? FramesNames,
+        List<string>? SizeNames,
         List<string>? Url,
         bool? IsInWishlist
     );
