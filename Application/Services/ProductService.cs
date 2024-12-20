@@ -156,40 +156,30 @@ namespace Application.Services
                 return Enumerable.Empty<TEntity>();
             }
 
-            // Check if the repository is a ProductRepository
-            if (repository is IProductRepository productRepository && typeof(TEntity) == typeof(Product))
+            // Ensure TEntity has a property named "Name"
+            var nameProperty = typeof(TEntity).GetProperty("Name");
+            if (nameProperty == null || nameProperty.PropertyType != typeof(string))
             {
-                // Use the custom GetAllAsync method from ProductRepository
-                var products = await productRepository.GetAllAsync(
-                    p => names.Contains(EF.Property<string>(p, "Name"))
-                );
-
-                // Cast the result to IEnumerable<TEntity> explicitly
-                var entities = products.Cast<TEntity>();
-
-                // Validate the count
-                if (products == null || products.Count() != names.Count())
-                {
-                    var foundNames = products.Select(p => EF.Property<string>(p, "Name"));
-                    var missing = names.Except(foundNames);
-                    result.Errors.Add($"The following {entityType}(s) were not found: {string.Join(", ", missing)}");
-                }
-
-                return entities;
+                result.Errors.Add($"{entityType} does not have a valid 'Name' property.");
+                return Enumerable.Empty<TEntity>();
             }
 
-            // Fallback for generic repositories (reflection-based)
-            var genericEntities = await repository.GetAllAsync(e => names.Contains((string)e.GetType().GetProperty("Name")!.GetValue(e)));
+            // Query using EF Core without reflection
+            var entities = await repository.GetAllAsync(
+                e => names.Contains(EF.Property<string>(e, "Name"))
+            );
 
-            if (genericEntities == null || genericEntities.Count() != names.Count())
+            // Validate the count
+            if (entities == null || entities.Count() != names.Count())
             {
-                var foundNames = genericEntities.Select(e => (string)e.GetType().GetProperty("Name")!.GetValue(e));
+                var foundNames = entities.Select(e => EF.Property<string>(e, "Name"));
                 var missing = names.Except(foundNames);
                 result.Errors.Add($"The following {entityType}(s) were not found: {string.Join(", ", missing)}");
             }
 
-            return genericEntities;
+            return entities;
         }
+
 
 
 
@@ -367,50 +357,117 @@ namespace Application.Services
         {
             if (images == null) return;
 
-            var currentPhotos = product.ProductPhotos.ToDictionary(pp => pp.Hash, pp => pp);
+            // Map current photos by their hash
+            var currentPhotosGrouped = product.ProductPhotos
+                .GroupBy(pp => pp.Hash)
+                .ToDictionary(g => g.Key, g => g.ToList());
 
-            // Generate new photos with hashes
-            var newPhotos = images.Select(image => (Image: image, Hash: GetPhotoHash(image))).ToList();
+            // Generate hashes for new images and remove duplicates
+            var newPhotosGrouped = images
+                .Where(image => image != null)
+                .Select(image => (Image: image, Hash: GetPhotoHash(image)))
+                .GroupBy(np => np.Hash)
+                .ToDictionary(g => g.Key, g => g.ToList());
 
-            // Find photos to add and remove
-            var photosToAdd = newPhotos.Where(np => !currentPhotos.ContainsKey(np.Hash)).ToList();
-            var photosToRemove = currentPhotos.Values.Where(cp => !newPhotos.Any(np => np.Hash == cp.Hash)).ToList();
-
-            // Remove old photos
-            foreach (var photo in photosToRemove)
+            // Ensure the product directory exists
+            var directoryPath = Path.Combine(_environment.WebRootPath, "Product");
+            if (!Directory.Exists(directoryPath))
             {
-                product.ProductPhotos.Remove(photo);
-                var oldImagePath = Path.Combine(_environment.WebRootPath, photo.Url.TrimStart('/'));
-                if (File.Exists(oldImagePath))
-                {
-                    File.Delete(oldImagePath);
-                }
+                Directory.CreateDirectory(directoryPath);
             }
 
-            // Add new photos
-            foreach (var (image, hash) in photosToAdd)
+            // Process each hash in the current photos
+            foreach (var currentHash in currentPhotosGrouped.Keys.ToList())
             {
-                string uniqueFilename = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
-                var filePath = Path.Combine(_environment.WebRootPath, "Product", uniqueFilename);
+                currentPhotosGrouped.TryGetValue(currentHash, out var currentPhotos);
+                newPhotosGrouped.TryGetValue(currentHash, out var newPhotosWithSameHash);
 
-                var directoryPath = Path.GetDirectoryName(filePath);
-                if (!Directory.Exists(directoryPath))
+                // Count existing and new photos with the same hash
+                var currentCount = currentPhotos?.Count ?? 0;
+                var newCount = newPhotosWithSameHash?.Count ?? 0;
+
+                if (newCount > currentCount)
                 {
-                    Directory.CreateDirectory(directoryPath);
+                    // Add more photos to match the count
+                    foreach (var (image, hash) in newPhotosWithSameHash.Skip(currentCount))
+                    {
+                        try
+                        {
+                            string uniqueFilename = Guid.NewGuid() + Path.GetExtension(image.FileName);
+                            var filePath = Path.Combine(directoryPath, uniqueFilename);
+
+                            await using var fileStream = new FileStream(filePath, FileMode.Create);
+                            await image.CopyToAsync(fileStream);
+
+                            product.ProductPhotos.Add(new ProductPhoto
+                            {
+                                Url = $"/Product/{uniqueFilename}",
+                                Hash = hash
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[Error] Failed to add photo {image.FileName}: {ex.Message}");
+                        }
+                    }
                 }
-
-                await using var fileStream = new FileStream(filePath, FileMode.Create);
-                await image.CopyToAsync(fileStream);
-
-                product.ProductPhotos.Add(new ProductPhoto
+                else if (newCount < currentCount)
                 {
-                    Url = $"/Product/{uniqueFilename}",
-                    Hash = hash
-                });
+                    // Remove excess photos to match the count
+                    var photosToRemove = currentPhotos.Take(currentCount - newCount).ToList();
+                    foreach (var photo in photosToRemove)
+                    {
+                        try
+                        {
+                            product.ProductPhotos.Remove(photo);
+                            var oldImagePath = Path.Combine(_environment.WebRootPath, photo.Url.TrimStart('/'));
+                            if (File.Exists(oldImagePath))
+                            {
+                                File.Delete(oldImagePath);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error deleting file {photo.Url}: {ex.Message}");
+                        }
+                    }
+                }
+                // Do nothing if the counts are equal
+            }
+
+            // Process new photos with hashes not in current photos
+            foreach (var (hash, newPhotosWithSameHash) in newPhotosGrouped)
+            {
+                if (!currentPhotosGrouped.ContainsKey(hash))
+                {
+                    foreach (var (image, _) in newPhotosWithSameHash)
+                    {
+                        try
+                        {
+                            string uniqueFilename = Guid.NewGuid() + Path.GetExtension(image.FileName);
+                            var filePath = Path.Combine(directoryPath, uniqueFilename);
+
+                            await using var fileStream = new FileStream(filePath, FileMode.Create);
+                            await image.CopyToAsync(fileStream);
+
+                            product.ProductPhotos.Add(new ProductPhoto
+                            {
+                                Url = $"/Product/{uniqueFilename}",
+                                Hash = hash
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[Error] Failed to add photo {image.FileName}: {ex.Message}");
+                        }
+                    }
+                }
             }
         }
 
-            public async Task<ServiceResult> DeleteProductAsync(int ProductId)
+
+
+        public async Task<ServiceResult> DeleteProductAsync(int ProductId)
         {
             ServiceResult result = new ServiceResult();
             // Fetch the product to be deleted
