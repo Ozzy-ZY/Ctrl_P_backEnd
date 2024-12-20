@@ -99,7 +99,6 @@ public class WishlistService
         );
 
         if (wishlists == null || !wishlists.Any())
-
         {
             return new List<WishlistDto>();
         }
