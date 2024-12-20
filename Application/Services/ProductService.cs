@@ -465,9 +465,11 @@ namespace Application.Services
             }
         }
 
-
+=========
 
         public async Task<ServiceResult> DeleteProductAsync(int ProductId)
+        public async Task<ServiceResult> DeleteProductAsync(int ProductId)
+>>>>>>>>> Temporary merge branch 2
         {
             ServiceResult result = new ServiceResult();
             // Fetch the product to be deleted
