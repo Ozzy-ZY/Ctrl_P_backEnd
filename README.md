@@ -20,8 +20,13 @@
   "AllowedHosts": "*",
   "ConnectionStrings": {
    "DefaultConnection": "Data Source=Your DB server;Initial Catalog=Ctrl_P;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False"
+  },
+  "Stripe": {
+    "SecretKey": "",
+    "PublishableKey": "",
+    "WebhookSecret": ""
   }
-  }
+}
 ```
 (Printing Solutions Agency)
 
