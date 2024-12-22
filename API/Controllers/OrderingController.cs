@@ -68,8 +68,10 @@ public class OrderingController: ControllerBase
     [Authorize]
     public async Task<IActionResult> GetOrderDetails(int orderId)
     {
-        var result = await _orderingService.GetOrderDetailsById(orderId);
-        if (result == null)
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+        bool isAdmin = User.IsInRole(StaticData.AdminRole);
+        var result = await _orderingService.GetOrderDetailsById(orderId, userId, isAdmin);
+        if (result == null || (result.UserId != userId && !isAdmin))
         {
             return NoContent();
         }

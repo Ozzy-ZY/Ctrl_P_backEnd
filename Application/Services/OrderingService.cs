@@ -90,9 +90,13 @@ public class OrderingService
         return orders;
     }
 
-    public async Task<Order?> GetOrderDetailsById(int? orderId)
+    public async Task<Order?> GetOrderDetailsById(int? orderId, int userId, bool isAdmin)
     {
         var order = await _unitOfWork.Orders.GetAsync(o=> o.Id == orderId, o => o.OrderItems);
+        if (order?.UserId != userId && !isAdmin)
+        {
+            order = new Order();
+        }
         return order;
     } 
     public async Task<ServiceResult> ChangeOrderStatus(int orderId, string newStatus)
