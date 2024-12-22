@@ -47,7 +47,6 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
 var app = builder.Build();
-app.UseDelta<AppDbContext>();
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{
