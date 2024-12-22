@@ -62,7 +62,7 @@ public class StripController: ControllerBase
                             Name = "Cart Purchase",
                         }
                     },
-                    Quantity = cart.CartItems.Sum(cartItem => cartItem.Quantity),
+                    Quantity = 1,
                 },
             },
             Mode = "payment",
