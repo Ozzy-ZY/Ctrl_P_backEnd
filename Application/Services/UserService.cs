@@ -105,7 +105,8 @@ public class UserService
             result.Success = true;
             return result;
         }
-        result.Errors.Add("Password Change Failed");
+        var errs = idResult.Errors.Select(x => x.Description);
+        result.Errors.AddRange(errs);
         return result;
     }
 }

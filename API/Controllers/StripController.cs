@@ -36,6 +36,8 @@ public class StripController: ControllerBase
     public async Task<ActionResult> Pay()
     {
         //Console.WriteLine($"Stripe API Key: {StripeConfiguration.ApiKey}");
+        string successfulUrl = Request.Headers["SuccessURL"];
+        string failedUrl = Request.Headers["FailedURL"];
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
         var cart = await _unitOfWork.Carts.GetCartWithItemsAsync(userId);
         if (cart == null)
@@ -48,6 +50,7 @@ public class StripController: ControllerBase
         }
         SessionCreateOptions options = new SessionCreateOptions()
         {
+            PaymentMethodTypes = ["card"],
             ClientReferenceId = userId.ToString(),
             LineItems = new List<SessionLineItemOptions>()
             {
@@ -66,8 +69,8 @@ public class StripController: ControllerBase
                 },
             },
             Mode = "payment",
-            SuccessUrl = "https://www.google.com",
-            CancelUrl = "https://os.phil-opp.com/",
+            SuccessUrl = successfulUrl??"https://control-p2.vercel.app/",
+            CancelUrl = failedUrl?? "https://control-p2.vercel.app/",
         };
         var service = new SessionService();
         //Console.WriteLine($"Stripe API Key: {StripeConfiguration.ApiKey}");
