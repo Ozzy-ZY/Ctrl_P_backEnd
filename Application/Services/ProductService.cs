@@ -230,7 +230,7 @@ namespace Application.Services
             return productDto;
         }
 
-        public async Task<ServiceResult> UpdateProductAsync(ProductDTOCreate dto)
+        public async Task<ServiceResult> UpdateProductAsync(ProductDTOUpdate dto)
         {
             ServiceResult result = new ServiceResult();
 
@@ -268,31 +268,46 @@ namespace Application.Services
                 return result;
             }
 
-            // Step 3: Update relationships
-            UpdateProductRelationships(
-                product.ProductCategories,
-                categories.Select(c => c.Id).ToHashSet(),
-                pc => pc.CategoryId,
-                id => new ProductCategory { ProductId = product.Id, CategoryId = id }
-            );
-            UpdateProductRelationships(
-                product.ProductFrames,
-                frames.Select(f => f.Id).ToHashSet(),
-                pf => pf.FrameId,
-                id => new ProductFrame { ProductId = product.Id, FrameId = id }
-            );
-            UpdateProductRelationships(
-                product.ProductMaterials,
-                materials.Select(m => m.Id).ToHashSet(),
-                pm => pm.MaterialId,
-                id => new ProductMaterial { ProductId = product.Id, MaterialId = id }
-            );
-            UpdateProductRelationships(
-                product.ProductSizes,
-                sizes.Select(s => s.Id).ToHashSet(),
-                ps => ps.SizeId,
-                id => new ProductSize { ProductId = product.Id, SizeId = id }
-            );
+            // Step 3: Update relationships (only if valid data is provided)
+            if (categories != null && categories.Any())
+            {
+                UpdateProductRelationships(
+                    product.ProductCategories,
+                    categories.Select(c => c.Id).ToHashSet(),
+                    pc => pc.CategoryId,
+                    id => new ProductCategory { ProductId = product.Id, CategoryId = id }
+                );
+            }
+
+            if (frames != null && frames.Any())
+            {
+                UpdateProductRelationships(
+                    product.ProductFrames,
+                    frames.Select(f => f.Id).ToHashSet(),
+                    pf => pf.FrameId,
+                    id => new ProductFrame { ProductId = product.Id, FrameId = id }
+                );
+            }
+
+            if (materials != null && materials.Any())
+            {
+                UpdateProductRelationships(
+                    product.ProductMaterials,
+                    materials.Select(m => m.Id).ToHashSet(),
+                    pm => pm.MaterialId,
+                    id => new ProductMaterial { ProductId = product.Id, MaterialId = id }
+                );
+            }
+
+            if (sizes != null && sizes.Any())
+            {
+                UpdateProductRelationships(
+                    product.ProductSizes,
+                    sizes.Select(s => s.Id).ToHashSet(),
+                    ps => ps.SizeId,
+                    id => new ProductSize { ProductId = product.Id, SizeId = id }
+                );
+            }
 
             // Step 4: Update product photos
             try
@@ -306,12 +321,31 @@ namespace Application.Services
                 return result;
             }
 
-            // Step 5: Update other product details
-            product.Name = dto.Name;
-            product.Description = dto.Description;
-            product.Price = dto.Price;
-            product.OldPrice = dto.OldPrice;
-            product.InStockAmount = dto.UnitsInStock;
+            // Step 5: Update other product details (only if valid data is provided)
+            if (!string.IsNullOrWhiteSpace(dto.Name))
+            {
+                product.Name = dto.Name;
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.Description))
+            {
+                product.Description = dto.Description;
+            }
+
+            if (dto.Price > 0)
+            {
+                product.Price = dto.Price;
+            }
+
+            if (dto.OldPrice != null && dto.OldPrice > 0)
+            {
+                product.OldPrice = dto.OldPrice;
+            }
+
+            if (dto.UnitsInStock != null && dto.UnitsInStock > 0)
+            {
+                product.InStockAmount = dto.UnitsInStock;
+            }
 
             // Step 6: Save changes
             await _unitOfWork.Products.UpdateAsync(product);
@@ -325,6 +359,7 @@ namespace Application.Services
             result.Success = false;
             return result;
         }
+
 
         // Helper method to update many-to-many relationships
         private void UpdateProductRelationships<T>(

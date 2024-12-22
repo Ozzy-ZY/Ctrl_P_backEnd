@@ -40,4 +40,17 @@ namespace Application.DTOs
     public record ProductDtoDelete(
         int Id
     );
+    public record ProductDTOUpdate(
+        int Id,
+        string? Name,
+        string? Description,
+        decimal Price,
+        decimal? OldPrice,
+        int UnitsInStock,
+        List<string>? CategoryNames,
+        List<string>? FramesNames,
+        List<string>? MaterialsNames,
+        List<string>? SizesNames,
+        List<IFormFile>? Image
+    );
 }
