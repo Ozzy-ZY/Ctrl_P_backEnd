@@ -61,7 +61,7 @@ public class OrderingService
         }
 
         await _unitOfWork.OrderItems.AddBulkAsync(orderItems);
-        if (await _unitOfWork.CommitAsync() > 0)
+        if (await _cartService.EmptyTheCart(userId) != false)
         {
             result.Success = true;
             return result;
