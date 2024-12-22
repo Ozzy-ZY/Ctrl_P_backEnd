@@ -15,12 +15,15 @@ namespace API.Controllers
         private readonly IProductService _productService;
         private readonly IValidator<ProductDTO> _validator;
         private readonly IValidator<ProductDTOCreate> _validatorCreate;
+        private readonly IValidator<ProductDTOUpdate> _validatorUpdate;
 
-        public ProductController(IProductService productService, IValidator<ProductDTO> validator, IValidator<ProductDTOCreate> validatorCreate)
+        public ProductController(IProductService productService, IValidator<ProductDTO> validator, IValidator<ProductDTOCreate> validatorCreate, IValidator<ProductDTOUpdate> validatorUpdate)
         {
             _productService = productService;
             _validator = validator;
             _validatorCreate = validatorCreate;
+            _validatorUpdate = validatorUpdate;
+            _validatorUpdate = validatorUpdate;
         }
 
         [HttpPost]
@@ -64,9 +67,9 @@ namespace API.Controllers
         }
         [HttpPut("UpdateProduct")]
         [Authorize]
-        public async Task<IActionResult> UpdateProduct([FromForm] ProductDTOCreate productDto)
+        public async Task<IActionResult> UpdateProduct([FromForm] ProductDTOUpdate productDto)
         {
-            ValidationResult result = await _validatorCreate.ValidateAsync(productDto);
+            ValidationResult result = await _validatorUpdate.ValidateAsync(productDto);
             if (!result.IsValid)
             {
                 return BadRequest(result.Errors);

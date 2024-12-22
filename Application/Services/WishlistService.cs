@@ -55,7 +55,6 @@ public class WishlistService
     {
         ServiceResult result = new ServiceResult();
 
-
         var wishlist = await _unitOfWork.Wishlists.GetAsync(w => w.ProductId == productId);
         if (wishlist == null)
         {
@@ -80,7 +79,6 @@ public class WishlistService
         }
 
         result.Errors.Add("Couldn't remove the product from your wishlist.");
-
         result.Success = false;
         return result;
     }
@@ -101,7 +99,6 @@ public class WishlistService
         );
 
         if (wishlists == null || !wishlists.Any())
-
         {
             return new List<WishlistDto>();
         }
@@ -112,7 +109,6 @@ public class WishlistService
         {
             if (wishlist.Product == null) continue;
 
-
             var wishlistDto = wishlist.ToDTO();
             wishlistDto = wishlistDto with { IsInWishlist = await IsProductInWishlistAsync(userId, wishlistDto.ProductId) };
             wishlistDtos.Add(wishlistDto);
@@ -120,7 +116,6 @@ public class WishlistService
 
         return wishlistDtos;
     }
-
 
     public async Task<bool> IsProductInWishlistAsync(int userId, int productId)
     {

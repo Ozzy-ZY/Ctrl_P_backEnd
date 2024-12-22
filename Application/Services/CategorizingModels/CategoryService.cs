@@ -100,18 +100,14 @@ public class CategoryService
         await _unitOfWork.Categories.UpdateAsync(existingCategory);
         var commitResult = await _unitOfWork.CommitAsync();
 
-
         result.Success = commitResult > 0;
         if (!result.Success)
-
         {
             result.Errors.Add("Failed to update category in the database.");
         }
 
-
         return result;
     }
-
 
     public async Task<ServiceResult> DeleteCategoryAsync(int categoryId)
     {
