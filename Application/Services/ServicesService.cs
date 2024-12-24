@@ -81,10 +81,13 @@ public class ServicesService
         }
         return result;
     }
-    public async Task<int> DeleteServiceAsync(ServiceDTO serviceDTO)
+    public async Task<int> DeleteServiceAsync(int id)
     {
-        var existingService = await _unitOfWork.Services.GetAsync(s => s.Id == serviceDTO.Id);
-
+        var existingService = await _unitOfWork.Services.GetAsync(s => s.Id == id);
+        if (existingService == null)
+        {
+            return await _unitOfWork.CommitAsync();
+        }
         if (!string.IsNullOrEmpty(existingService.ImageUrl))
         {
             var oldImagePath = Path.Combine(_environment.WebRootPath, existingService.ImageUrl.TrimStart('/'));
