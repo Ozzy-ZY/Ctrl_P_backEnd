@@ -14,15 +14,15 @@ using ProductService = Stripe.ProductService;
 namespace API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-public class StripController: ControllerBase
+public class StripeController: ControllerBase
 {
 
     private readonly IUnitOfWork _unitOfWork;
     private readonly OrderingService _orderingService;
     private readonly CartService _cartService;
-    private readonly ILogger<StripController> _logger;
+    private readonly ILogger<StripeController> _logger;
     private readonly IConfiguration _configuration;
-    public StripController( IUnitOfWork unitOfWork, OrderingService orderingService, ILogger<StripController> logger,IConfiguration configuration, CartService cartService)
+    public StripeController( IUnitOfWork unitOfWork, OrderingService orderingService, ILogger<StripeController> logger,IConfiguration configuration, CartService cartService)
     {
         _unitOfWork = unitOfWork;
         _orderingService = orderingService;
