@@ -14,9 +14,9 @@ public class MessagesService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<IEnumerable<Message>> GetAllMessagesAsync(int pageNumber = 1, int pageSize = 10)
+    public async Task<IEnumerable<Message>> GetAllMessagesAsync()
     {
-        var messages = (await _unitOfWork.Messages.GetPaginatedAsync(pageNumber, pageSize)).Items;
+        var messages = (await _unitOfWork.Messages.GetAllAsync());
         return messages;
     }
 

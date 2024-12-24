@@ -20,11 +20,11 @@ public class MessagesController: ControllerBase
         _messageValidator = messageValidator;
     }
 
-    [HttpGet("GetMessagesPage/{pageNumber}/{pageSize}")]
+    [HttpGet("GetMessagesPage/")]
     [Authorize(Roles = StaticData.AdminRole)]
-    public async Task<IActionResult> GetMessages(int pageNumber = 1, int pageSize = 10)
+    public async Task<IActionResult> GetMessages()
     {
-        var result = await _messagesService.GetAllMessagesAsync(pageNumber, pageSize);
+        var result = await _messagesService.GetAllMessagesAsync();
         if (result.Any())
         {
             return Ok(result);
