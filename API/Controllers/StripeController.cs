@@ -122,11 +122,6 @@ public async Task<ActionResult> StripWebhook()
             }
 
             _logger.LogInformation("Order successfully created for user ID {UserId}.", userId);
-            if (await _cartService.EmptyTheCart(userId) == false)
-            {
-                _logger.LogError("couldn't empty the cart for user ID {UserId}.", userId);
-                return BadRequest(new { error = "couldn't empty the cart" });
-            }
             await _unitOfWork.CommitAsync();
         }
 
