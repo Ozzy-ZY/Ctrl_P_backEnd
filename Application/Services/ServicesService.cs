@@ -70,9 +70,9 @@ public class ServicesService
         return await _unitOfWork.CommitAsync();
     }
 
-    public async Task<IEnumerable<ServiceDTO>> GetAllServicesAsync(int pageNumber, int PageSize)
+    public async Task<IEnumerable<ServiceDTO>> GetAllServicesAsync()
     {
-        var listOfServices = ((await _unitOfWork.Services.GetPaginatedAsync(pageNumber,PageSize))!).Items;
+        var listOfServices = ((await _unitOfWork.Services.GetAllAsync())!);
         List<ServiceDTO> result = new List<ServiceDTO>();
 
         foreach (var Service in listOfServices)
